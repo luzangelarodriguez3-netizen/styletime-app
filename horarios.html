@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Horarios y bloqueos</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .page-cover{ position: fixed; inset: 0; background-size: cover; background-position:center; z-index:0; filter:saturate(.96) contrast(.98) brightness(.98);}
+    .phone::before{ content:""; position:fixed; inset:0; z-index:0; background: color-mix(in oklab, var(--bg) 82%, transparent); backdrop-filter: blur(2px); }
+
+    .wrap{
+      position: relative; z-index:1;
+      margin: 12px 12px 80px; padding: 14px 16px; border-radius: 16px;
+      background: rgba(var(--brand-rgb,221 51 139) / .10);
+      border: 1px solid rgba(var(--brand-rgb,221 51 139)/.18);
+      box-shadow: 0 8px 22px rgba(0,0,0,.06);
+      backdrop-filter: blur(6px);
+      max-width: 760px;
+      margin-left: auto; margin-right: auto;
+    }
+    .grid-rows{ display:grid; gap:10px; }
+    .row{
+      display:grid; grid-template-columns: 80px 1fr 1fr; gap:10px;
+      align-items:center; background:#fff; border:1px solid rgba(0,0,0,.06);
+      border-radius:12px; padding:8px 10px; box-shadow:0 2px 10px rgba(0,0,0,.06);
+    }
+    .row.disabled{ opacity:.55; }
+    .row label{ display:flex; gap:8px; align-items:center; font-weight:600; }
+    .row input[type="time"]{
+      width:100%; height:42px; border-radius:10px; border:1px solid var(--border);
+      padding:0 10px; background:#fff; font: 500 14px/1 var(--font-sans);
+    }
+
+    .blocks{ display:grid; gap:10px; margin-top:12px; }
+    .blocks__add{
+      display:grid; grid-template-columns: 1fr auto; gap:10px;
+      background:#fff; padding:8px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+    }
+    .blocks__chips{ display:flex; gap:8px; flex-wrap:wrap; }
+    .chip{
+      background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:8px 10px; display:flex; gap:8px; align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.05);
+    }
+    .chip button{ border:0; background:rgba(185 28 28 /.10); color:#b91c1c; border-radius:8px; padding:4px 8px; cursor:pointer; }
+
+    .btn{
+      height:42px; padding:0 16px; border-radius:999px; font-weight:600; cursor:pointer;
+      border:1px solid rgba(var(--brand-rgb)/.45); color:var(--brand); background:#fff;
+    }
+    .btn-primary{ color:#fff; background:var(--brand); border-color: color-mix(in oklab, var(--brand) 70%, #000); }
+    .actions{ margin-top:12px; display:flex; justify-content:flex-end; gap:10px; }
+
+    /* Banner + menú (idéntico a agenda/servicios) */
+    .banner{
+      position: relative; margin: 12px 12px 8px; padding: 14px 16px; border-radius: 16px;
+      background: var(--bg); box-shadow: 0 8px 22px rgba(0,0,0,.06); 
+    }
+    .banner.banner--with-cover::before{
+      content:""; position:absolute; inset:0; background-image:var(--cover-url); background-size:cover; background-position:center;
+      filter: blur(2px); opacity:.28;
+    }
+    .banner.banner--with-cover::after{
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(to bottom, rgba(var(--brand-rgb)/.10), rgba(255 255 255 /.15));
+      pointer-events:none;
+    }
+    .banner__row{ position:relative; z-index:1; display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; }
+    .avatar{ width:40px; height:40px; border-radius:999px; object-fit:cover; border:2px solid rgba(255,255,255,.7); box-shadow:0 2px 8px rgba(0,0,0,.10);}
+    .banner__name{ font-weight:600; color:#1a1a1a; }
+    .menu-btn{
+      font-size:22px; line-height:1; width:40px; height:40px; border-radius:999px; border:0; cursor:pointer; display:grid; place-items:center;
+      backdrop-filter: blur(6px); background: rgba(var(--brand-rgb,96 96 96) /.15); color:#111;
+      box-shadow:0 2px 10px rgba(0,0,0,.10), inset 0 0 0 1px rgba(255,255,255,.4);
+    }
+    .menu-btn:hover{ background: rgba(var(--brand-rgb,96 96 96) /.25); }
+    .menu-panel{
+      position:absolute; right:12px; top:56px; min-width:220px; border-radius:16px; padding:8px;
+      background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.18); border:1px solid rgba(0,0,0,.06); z-index:1000;
+    }
+    .menu-panel[hidden]{ display:block !important; visibility:hidden; opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .2s, transform .2s, visibility .2s; }
+    .menu-panel:not([hidden]){ visibility:visible; opacity:1; transform:none; }
+    .menu-panel a, .menu-panel button{
+      all:unset; display:block; width:100%; padding:10px 12px; border-radius:10px; font-size:14px; color:#1f2937; cursor:pointer;
+    }
+    .menu-panel a:hover, .menu-panel button:hover{ background: rgba(var(--brand-rgb,96 96 96) /.10); }
+    .menu-panel .menu-logout{ color:#b91c1c; font-weight:600; border-top:1px solid rgba(0,0,0,.06); margin-top:4px; padding-top:10px; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 767px) {
+      .wrap { margin-left: 8px; margin-right: 8px; }
+      .row {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "day day"
+          "start-time end-time";
+        padding: 12px; row-gap: 10px;
+      }
+      .row label { grid-area: day; font-size: 16px; }
+      .row input[type="time"]:nth-of-type(1) { grid-area: start-time; }
+      .row input[type="time"]:nth-of-type(2) { grid-area: end-time; }
+      .blocks__add { grid-template-columns: 1fr; }
+      .blocks__add .btn { width: 100%; }
+      .actions { justify-content: stretch; }
+      .actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div id="loader" class="loader-container">
+      <div class="loader-spinner"></div>
+      <p>Cargando...</p>
+    </div>
+
+    <div class="page-cover" id="pageCover" aria-hidden="true"></div>
+    <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--tl">
+
+    <div id="pageCover" class="page-cover" aria-hidden="true"></div>
+
+    <header class="banner" id="banner">
+      <div class="banner__row">
+        <img id="bizLogo" class="avatar" src="./assets/logo.svg" alt="Logo" />
+        <div class="banner__name" id="bizName">Mi negocio</div>
+
+        <button id="menuBtn" class="menu-btn" aria-label="Menú" aria-haspopup="menu" aria-expanded="false">⋮</button>
+        <nav id="menuPanel" class="menu-panel" hidden role="menu" aria-labelledby="menuBtn">
+          <a role="menuitem" href="./agenda.html">Inicio</a>
+          <a role="menuitem" href="./realizadas.html">Citas realizadas</a>
+          <a role="menuitem" href="./canceladas.html">Citas canceladas</a>
+          <a role="menuitem" href="./servicios.html">Servicios</a>
+          <a role="menuitem" href="./horarios.html">Horarios y bloqueos</a>
+          <a role="menuitem" href="./configuracion.html">Configuración</a>
+          <button role="menuitem" type="button" class="menu-logout" data-action="logout">Cerrar sesión</button>
+        </nav>
+      </div>
+    </header>
+
+    <section class="wrap">
+      <h2 class="screen-title">Horarios</h2>
+      <div id="hours" class="grid-rows"></div>
+
+      <div class="actions">
+        <button id="btnSaveHours" class="btn btn-primary" type="button">Guardar horarios</button>
+      </div>
+
+      <h2 class="screen-title" style="margin-top:16px">Bloqueos de fecha</h2>
+      <div class="blocks">
+        <div class="blocks__add">
+          <input id="blockDate" class="input input--rect" type="date" />
+          <button id="btnAddBlock" class="btn" type="button">Añadir bloqueo</button>
+        </div>
+
+        <div id="chips" class="blocks__chips"></div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" hidden role="alert" aria-live="assertive"></div>
+  </main>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="./supabaseClient.js"></script>
+
+  <script>
+  (async function () {
+    // Helpers
+    function showToast(msg, type='info', ms=2200){
+      const t = document.getElementById('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.className = `toast toast--${type} is-visible`;
+      t.hidden = false;
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(()=>{ t.classList.remove('is-visible'); t.hidden = true; }, ms);
+    }
+    function hexToRgb(hex){
+      const n = hex.replace('#','');
+      const big = parseInt(n.length===3 ? n.split('').map(c=>c+c).join('') : n.slice(0,6), 16);
+      return { r:(big>>16)&255, g:(big>>8)&255, b:big&255 };
+    }
+    const DOWS = [null,'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+
+    const pad = n => String(n).padStart(2,'0');
+    const timeToMin = v => { const p=v.split(':'); const h=+(p[0]||0), m=+(p[1]||0); return (h*60+m)|0; }
+    const minToTime = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
+
+    // Sesión
+    const { data: userData } = await sb.auth.getUser();
+    if (!userData || !userData.user){ location.href = 'login.html'; return; }
+    const userId = userData.user.id;
+
+    // Tema + portada
+    const bizResp = await sb
+      .from('businesses')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const biz = bizResp.data, bizErr = bizResp.error;
+    if (bizErr){ console.error(bizErr); showToast('Error cargando negocio','error'); return; }
+    if (!biz){ location.href = 'personalizacion.html'; return; }
+
+    const root = document.documentElement;
+    const brand = (biz.brand || '#DD338B').toUpperCase();
+    root.style.setProperty('--brand', brand);
+    const rgb = hexToRgb(brand);
+    root.style.setProperty('--brand-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
+    root.style.setProperty('--bg', biz.bg_pastel || '#FAE9F2');
+
+    // banner
+    const logoEl = document.getElementById('bizLogo');
+    const pageCover = document.getElementById('pageCover');
+    const bannerEl = document.getElementById('banner');
+    document.getElementById('bizName').textContent = biz.business_name || 'Mi negocio';
+    logoEl.src = biz.logo_url || './assets/logo.svg';
+    logoEl.onerror = ()=>{ logoEl.src = './assets/logo.svg'; };
+    if (biz.cover_url){
+      pageCover.style.backgroundImage = `url('${biz.cover_url}')`;
+      bannerEl.style.setProperty('--cover-url', `url('${biz.cover_url}')`);
+      bannerEl.classList.add('banner--with-cover');
+    }
+
+    // Menú
+    const menuBtn   = document.getElementById('menuBtn');
+    const menuPanel = document.getElementById('menuPanel');
+    function closeMenu(){
+      if (menuPanel.hidden) return;
+      menuPanel.hidden = true;
+      menuBtn.setAttribute('aria-expanded','false');
+    }
+    menuBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const open = menuPanel.hidden;
+      menuPanel.hidden = !open;
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e)=>{
+      if (!menuPanel.hidden && !menuPanel.contains(e.target) && e.target !== menuBtn) closeMenu();
+    });
+    document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeMenu(); });
+    menuPanel.addEventListener('click', async (e)=>{
+      if (e?.target?.dataset?.action === 'logout'){
+        try{ await sb.auth.signOut(); location.href='login.html'; }catch(err){ console.error(err); }
+      }
+    });
+
+    // UI: Horarios
+    const hoursEl = document.getElementById('hours');
+    function makeRow(dow, enabled=true, start_min=480, end_min=1080){
+      const row = document.createElement('div');
+      row.className = 'row';
+      if(!enabled) row.classList.add('disabled');
+
+      const lab = document.createElement('label');
+      const cb  = document.createElement('input');
+      cb.type='checkbox'; cb.checked = enabled; cb.addEventListener('change', ()=> row.classList.toggle('disabled', !cb.checked));
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(DOWS[dow]));
+
+      const iStart = document.createElement('input'); iStart.type='time'; iStart.value = minToTime(start_min);
+      const iEnd   = document.createElement('input'); iEnd.type='time';   iEnd.value   = minToTime(end_min);
+
+      row.dataset.dow = dow;
+      row.appendChild(lab);
+      row.appendChild(iStart);
+      row.appendChild(iEnd);
+      return row;
+    }
+
+    async function loadHours(){
+      const resp = await sb
+        .from('working_hours')
+        .select('*')
+        .eq('user_id', userId)
+        .order('dow', { ascending:true });
+
+      hoursEl.innerHTML = '';
+      if (resp.error){ console.error(resp.error); showToast('No se pudieron cargar horarios','error'); return; }
+
+      const data = resp.data || [];
+      if (!data.length){
+        for(let dow=1; dow<=7; dow++){
+          const enabled = dow !== 7; // Domingo cerrado por defecto
+          hoursEl.appendChild(makeRow(dow, enabled, 480, 1080));
+        }
+      }else{
+        data.forEach(it => hoursEl.appendChild(makeRow(it.dow, it.enabled, it.start_min, it.end_min)));
+      }
+    }
+
+    document.getElementById('btnSaveHours').addEventListener('click', async ()=>{
+      const rows = Array.from(hoursEl.querySelectorAll('.row'));
+      const payload = rows.map(r=>{
+        const dow = Number(r.dataset.dow);
+        const enabled = r.querySelector('input[type="checkbox"]').checked;
+        const [iStart, iEnd] = r.querySelectorAll('input[type="time"]');
+        const start_min = timeToMin(iStart.value || '08:00');
+        const end_min   = timeToMin(iEnd.value   || '18:00');
+        return { user_id: userId, dow, enabled, start_min, end_min, updated_at: new Date().toISOString() };
+      });
+
+      const up = await sb.from('working_hours').upsert(payload, { onConflict:'user_id,dow' });
+      if (up.error){ console.error(up.error); showToast('No se pudo guardar','error'); return; }
+      showToast('Horarios guardados','success');
+      await loadHours();
+    });
+
+    // ====== BLOQUEOS: sin desfase ======
+    const blockDateEl = document.getElementById('blockDate');
+    const chipsEl     = document.getElementById('chips');
+
+    // Formatea "aaaa-mm-dd" a una etiqueta agradable SIN cambiar el día
+    function labelFromISO(iso){
+      const [y,m,d] = iso.split('-').map(Number);
+      const dt = new Date(y, m-1, d); // sólo para mostrar
+      return dt.toLocaleDateString('es-ES',{ weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+    }
+
+    function renderBlocks(items){
+      chipsEl.innerHTML = '';
+      if (!items?.length) return;
+      items.forEach(it=>{
+        const chip = document.createElement('div'); chip.className='chip';
+        const span = document.createElement('span');
+        span.textContent = labelFromISO(it.date); // <- NO new Date(it.date)
+        const btn  = document.createElement('button'); btn.textContent='Quitar';
+        btn.addEventListener('click', async ()=>{
+          const del = await sb.from('day_blocks').delete().eq('user_id', userId).eq('date', it.date);
+          if (del.error){ console.error(del.error); showToast('No se pudo quitar','error'); return; }
+          showToast('Bloqueo eliminado','success'); await loadBlocks();
+        });
+        chip.appendChild(span); chip.appendChild(btn); chipsEl.appendChild(chip);
+      });
+    }
+
+    async function loadBlocks(){
+      const resp = await sb
+        .from('day_blocks')
+        .select('date')
+        .eq('user_id', userId)
+        .order('date', { ascending:true });
+
+      if (resp.error){ console.error(resp.error); showToast('No se pudieron cargar bloqueos','error'); return; }
+      renderBlocks(resp.data || []);
+    }
+
+    document.getElementById('btnAddBlock').addEventListener('click', async ()=>{
+      const d = (blockDateEl.value || '').trim(); // <input type="date"> ya trae YYYY-MM-DD
+      if (!d){ showToast('Selecciona una fecha','error'); return; }
+      const ins = await sb.from('day_blocks').insert({ user_id:userId, date:d }); // <- guardar cadena exacta
+      if (ins.error){ console.error(ins.error); showToast('No se pudo añadir bloqueo','error'); return; }
+      blockDateEl.value = '';
+      showToast('Bloqueo añadido','success');
+      await loadBlocks();
+    });
+
+    // Init
+    await loadHours();
+    await loadBlocks();
+    document.getElementById('loader').classList.add('hidden');
+  })();
+  </script>
+</body>
+</html>

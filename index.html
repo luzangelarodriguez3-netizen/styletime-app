@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StyleTime - Bienvenid@</title>
+
+  <!-- Fuente (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- Lienzo móvil (simula teléfono 390px) -->
+  <main class="phone">
+    <!-- Fondo decorativo -->
+     <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--tl">
+     <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--br">
+    <div class="bg-deco bg-deco--tl" aria-hidden="true"></div>
+    <div class="bg-deco bg-deco--br" aria-hidden="true"></div>
+
+    <!-- Contenido centrado -->
+    <section class="hero">
+      <div class="logo-circle">
+         <img src="./assets/logo.svg" alt="Logo StyleTime" class="logo-svg" />
+       
+      </div>
+      <span class="brand">StyleTime</span>
+
+      <h1 class="title">Bienvenid@</h1>
+      <p class="subtitle">Ten el control  de tu negocio</p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="./registro.html">Registrar</a>
+        <a class="btn btn-outline" href="./login.html">Iniciar sesion</a>
+      </div>
+    </section>
+
+    <!-- Pie con legales (enlaces vacíos por ahora) -->
+    <footer class="legal">
+      <a href="./terminos.html">Términos y Condiciones</a>
+      <span>•</span>
+      <a href="./privacidad.html">Política de Privacidad</a>
+    </footer>
+  </main>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="./supabaseClient.js"></script>
+</body>
+</html>

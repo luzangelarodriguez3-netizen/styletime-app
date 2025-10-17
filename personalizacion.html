@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StyleTime - Personaliza tu agenda</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+
+  <style>
+    .logo-picker{position:relative;width:96px;height:96px;border-radius:50%;overflow:hidden;display:flex;justify-content:center;align-items:center;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+    .logo-picker img{width:100%;height:100%;object-fit:cover;object-position:center}
+    .logo-picker input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .bg-thumb{width:100%;max-width:240px;border-radius:16px;border:1px solid var(--border);background:#fdfdfd;background-size:contain;background-repeat:no-repeat;background-position:center;aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden;margin-bottom:10px}
+    .bg-thumb img{width:100%;height:auto;border-radius:12px}
+  </style>
+</head>
+
+<body>
+  <main class="phone phone--edit">
+
+    <!-- ===== AÑADE ESTE CÓDIGO AQUÍ ===== -->
+    <div id="loader" class="loader-container">
+      <div class="loader-spinner"></div>
+      <p>Cargando...</p>
+    </div>
+
+     
+    
+    <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--tl">
+    <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--br">
+    <div class="bg-deco bg-deco--tl" aria-hidden="true"></div>
+    <div class="bg-deco bg-deco--br" aria-hidden="true"></div>
+
+    <section class="screen screen--spacious screen--top">
+      <h1 class="screen-title">Personaliza tu agenda</h1>
+      <p class="subtitle subtitle--muted">Estos cambios los verá tu cliente al reservar.</p>
+
+      <form class="form" action="#" method="post" novalidate>
+        <div class="field">
+          <label class="label">Logo del negocio</label>
+          <div class="customizer-row">
+            <div class="logo-picker">
+              <img id="logoPreview" src="./assets/logo.svg" alt="Logo del negocio" />
+              <input type="file" id="logoInput" accept="image/*" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Foto de fondo (opcional)</label>
+          <div class="bg-thumb" id="bgThumb">Sin imagen</div>
+          <input type="file" id="bgInput" accept="image/*" />
+          <small class="hint">Vista previa reducida del fondo.</small>
+        </div>
+
+        <div class="field">
+          <label for="bizName" class="label">Nombre del negocio</label>
+          <input id="bizName" name="biz_name" type="text" class="input" placeholder="Ej. Trenzas de Laura" />
+        </div>
+
+        <div class="field">
+          <label class="label">Elige tu color representativo</label>
+          <div class="customizer-row">
+            <input type="color" id="colorPicker" class="input color-input" value="#DD338B" />
+            <input type="text" id="hexInput" class="input" value="#DD338B" maxlength="9" />
+          </div>
+          <small class="hint">El color actualizará botones y acentos. También generaremos un fondo pastel del mismo tono.</small>
+        </div>
+
+        <div class="actions actions--spaced">
+          <a class="btn btn-outline" href="./agenda.html">Ir a mi agenda</a>
+        </div>
+      </form>
+    </section>
+
+    <footer class="legal legal--raised">
+      <a href="./terminos.html">Términos y Condiciones</a>
+      <span>•</span>
+      <a href="./privacidad.html">Política de Privacidad</a>
+    </footer>
+
+    <div id="toast" class="toast" hidden role="alert" aria-live="assertive"></div>
+  </main>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="./supabaseClient.js"></script>
+
+  <script>
+  (async () => {
+    const { data: u } = await sb.auth.getUser();
+    if (!u?.user) { location.href = 'login.html'; return; }
+
+    function hexToRgb(hex){const n=hex.replace('#','');const big=parseInt(n.length===3?n.split('').map(c=>c+c).join(''):n.slice(0,6),16);return{r:(big>>16)&255,g:(big>>8)&255,b:big&255};}
+    function toHex(n){return n.toString(16).padStart(2,'0');}
+    function mixWithWhite(hex,t=0.88){const{r,g,b}=hexToRgb(hex);const rr=Math.round(r+(255-r)*t),gg=Math.round(g+(255-g)*t),bb=Math.round(b+(255-b)*t);return`#${toHex(rr)}${toHex(gg)}${toHex(bb)}`;}
+    function showToast(msg, type='info', ms=2600){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className=`toast toast--${type} is-visible`;t.hidden=false;clearTimeout(window._toastTimer);window._toastTimer=setTimeout(()=>{t.classList.remove('is-visible');t.hidden=true;},ms);}
+
+    const logoInput   = document.getElementById('logoInput');
+    const logoPreview = document.getElementById('logoPreview');
+    const bgInput     = document.getElementById('bgInput');
+    const bgThumb     = document.getElementById('bgThumb');
+    const bizNameEl   = document.getElementById('bizName');
+    const colorPicker = document.getElementById('colorPicker');
+    const hexInput    = document.getElementById('hexInput');
+
+    const { data: biz } = await sb.from('businesses').select('*').eq('user_id', u.user.id).order('updated_at',{ascending:false}).limit(1).maybeSingle();
+
+    if (biz) {
+      bizNameEl.value = biz.business_name || '';
+      const brand = biz.brand || '#DD338B';
+      colorPicker.value = brand; hexInput.value = brand;
+      document.documentElement.style.setProperty('--brand', brand);
+      const rgb = hexToRgb(brand);
+      document.documentElement.style.setProperty('--brand-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
+      const pastel = biz.bg_pastel || mixWithWhite(brand,0.88);
+      document.documentElement.style.setProperty('--bg', pastel);
+      if (biz.logo_url)  logoPreview.src = biz.logo_url;
+      if (biz.cover_url) {
+        bgThumb.style.backgroundImage = `url('${biz.cover_url}')`;
+        bgThumb.textContent = '';
+      }
+    }
+
+    logoInput?.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if (file) logoPreview.src = URL.createObjectURL(file);
+    });
+
+    bgInput?.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if (file) { bgThumb.style.backgroundImage = `url('${URL.createObjectURL(file)}')`; bgThumb.textContent = ''; }
+      else { bgThumb.style.backgroundImage = ''; bgThumb.textContent = 'Sin imagen'; }
+    });
+
+    const setThemeColor = (hex) => {
+      if (!/^#([0-9a-f]{3,8})$/i.test(hex)) return;
+      document.documentElement.style.setProperty('--brand', hex);
+      const rgb = hexToRgb(hex);
+      document.documentElement.style.setProperty('--brand-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
+      document.documentElement.style.setProperty('--bg', mixWithWhite(hex, 0.88));
+    };
+    colorPicker.addEventListener('input', e=>{ const v=e.target.value.toUpperCase(); hexInput.value=v; setThemeColor(v); });
+    hexInput.addEventListener('input', e=>{ const v=e.target.value.trim(); setThemeColor(v); if(/^#([0-9a-f]{3,8})$/i.test(v)) colorPicker.value=v; });
+
+    // GUARDAR
+    document.querySelector('.actions .btn').addEventListener('click', async (ev) => {
+      ev.preventDefault();
+
+      let logo_url  = biz?.logo_url  ?? null;
+      let cover_url = biz?.cover_url ?? null;
+
+      // Subir logo si hay archivo nuevo
+      if (logoInput?.files?.[0]) {
+        const file = logoInput.files[0];
+        const path = `${u.user.id}/logo_${Date.now()}_${file.name}`;
+        const { error: upErr } = await sb.storage.from('logos').upload(path, file, { upsert: true });
+        if (!upErr) {
+          const { data: pub } = sb.storage.from('logos').getPublicUrl(path);
+          logo_url = pub.publicUrl;
+        } else { console.error('Error uploading logo:', upErr); }
+      }
+
+      // Subir cover si hay archivo nuevo
+      if (bgInput?.files?.[0]) {
+        const file = bgInput.files[0];
+        const path = `${u.user.id}/cover_${Date.now()}_${file.name}`;
+        const { error: upErr } = await sb.storage.from('covers').upload(path, file, { upsert: true });
+        if (!upErr) {
+          const { data: pub } = sb.storage.from('covers').getPublicUrl(path);
+          cover_url = pub.publicUrl;
+        } else { console.error('Error uploading cover:', upErr); }
+      }
+
+      const brand  = (hexInput.value || '#DD338B').toUpperCase();
+      const pastel = mixWithWhite(brand, 0.88);
+
+      try {
+        const payload = {
+          user_id: u.user.id,
+          business_name: bizNameEl.value.trim() || 'Mi negocio',
+          brand,
+          bg_pastel: pastel,
+          logo_url,
+          cover_url,
+          updated_at: new Date().toISOString()
+        };
+
+        const { error: dbErr } = await sb.from('businesses').upsert(payload, { onConflict: 'user_id' });
+        if (dbErr) throw dbErr;
+
+        showToast('¡Tu agenda se guardó con éxito!', 'success', 1200);
+        setTimeout(() => location.href = 'agenda.html', 900);
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'No pudimos guardar tu agenda.', 'error', 3600);
+      }
+    });
+
+    document.getElementById('loader').classList.add('hidden');
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StyleTime - Iniciar sesión</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="phone">
+    <!-- Hojas decorativas -->
+    <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--tl">
+    <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--br">
+
+    <!-- Nubecitas -->
+    <div class="bg-deco bg-deco--tl" aria-hidden="true"></div>
+    <div class="bg-deco bg-deco--br" aria-hidden="true"></div>
+
+    <!-- Header compacto -->
+    <header class="hero hero--compact">
+      <div class="logo-circle">
+        <img src="./assets/logo.svg" alt="Logo StyleTime" class="logo-svg" />
+      </div>
+      <span class="brand">StyleTime</span>
+    </header>
+
+    <!-- Contenido -->
+    <section class="screen">
+      <h1 class="screen-title">Iniciar sesión</h1>
+
+      <!-- 1) Damos id al form -->
+      <form id="loginForm" class="form" action="#" method="post" novalidate>
+        <div class="field">
+          <label for="loginEmail" class="label">Correo electrónico</label>
+          <!-- 2) Cambiamos ids a los que usa el script -->
+          <input id="loginEmail" name="email" type="email" class="input"
+                 placeholder="tunegocio@email.com"
+                 autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label for="loginPass" class="label">Contraseña</label>
+          <input id="loginPass" name="password" type="password" class="input"
+                 placeholder="Tu contraseña"
+                 autocomplete="current-password" required />
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-outline">Iniciar sesión</button>
+        </div>
+
+        <!-- 3) Agregamos el contenedor de mensajes -->
+        <p id="loginMsg" class="form-note"></p>
+
+        <p class="form-note">
+          ¿No tienes cuenta? <a href="./registro.html" class="link">Crear cuenta</a>
+        </p>
+      </form>
+    </section>
+
+    <footer class="legal">
+      <a href="./terminos.html">Términos y Condiciones</a>
+      <span>•</span>
+      <a href="./privacidad.html">Política de Privacidad</a>
+    </footer>
+
+    <div id="toast" class="toast" hidden role="alert" aria-live="assertive"></div>
+  </main>
+
+  
+
+  <!-- Orden correcto de scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="./supabaseClient.js"></script>
+
+<script>
+  // Avisos reutilizables (usa tus estilos .toast del CSS)
+  function showToast(msg, type = 'info', ms = 2600){
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = `toast toast--${type} is-visible`;
+    t.hidden = false;
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => {
+      t.classList.remove('is-visible');
+      t.hidden = true;
+    }, ms);
+  }
+
+  // Usa los IDs REALES del formulario y campos
+  const form = document.getElementById('loginForm');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+
+    if (!email || !password) {
+      showToast('Escribe tu correo y contraseña.', 'error', 2800);
+      return;
+    }
+
+    try {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        showToast('Credenciales inválidas. Revisa tu correo/contraseña.', 'error', 3200);
+        return;
+      }
+
+      // Sesión OK ⇒ ¿tiene negocio?
+      const { data: u } = await sb.auth.getUser();
+      const { data: biz } = await sb
+        .from('businesses')
+        .select('*')
+        .eq('user_id', u.user.id)
+        .maybeSingle();
+
+      showToast('¡Bienvenido! Redirigiendo…', 'success', 1000);
+      setTimeout(() => {
+        location.href = biz ? 'agenda.html' : 'personalizacion.html';
+      }, 900);
+
+    } catch (err) {
+      showToast(err?.message || 'No pudimos iniciar sesión. Intenta de nuevo.', 'error', 3600);
+    }
+  });
+</script>
+</body>
+</html>

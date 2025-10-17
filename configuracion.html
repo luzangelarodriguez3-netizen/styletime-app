@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configuración</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .settings{position:relative;z-index:1;max-width:760px;margin:12px auto 40px;padding:16px;border-radius:16px;background:rgba(var(--brand-rgb,221 51 139)/.10);border:1px solid rgba(var(--brand-rgb,221 51 139)/.25);box-shadow:var(--elev-1);}
+    .settings h1{font-size:20px;font-weight:700;margin:6px 4px 14px;}
+    .set-list{display:grid;gap:10px;}
+    .set-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 10px rgba(0,0,0,.04);cursor:pointer;}
+    .set-item:hover{filter:brightness(1.02);}
+    .set-item .label{font-weight:600;color:#1f2937;}
+
+    a.set-item {text-decoration: none;}
+    .set-item .chev{opacity:.6;}
+    .pw-form{margin-top:8px;padding:12px;border-radius:12px;background:#fff;border:1px dashed rgba(var(--brand-rgb)/.35);display:grid;gap:10px;}
+    .pw-row{display:grid;gap:6px;}
+    .pw-actions{display:flex;gap:10px;justify-content:flex-end;}
+    .btn-small{border-radius:999px;padding:8px 14px;font-weight:700;border:0;cursor:pointer;box-shadow:0 8px 22px rgba(var(--brand-rgb)/.35);background:var(--brand);color:#fff;}
+    .btn-ghost{background:#fff;color:#111;border:1px solid rgba(0,0,0,.12);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+    .btn-danger{background:#b91c1c;color:#fff;}
+    /* Backdrops / dialogs */
+    .backdrop{position:fixed;inset:0;z-index:1000;display:none;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+    .dialog{width:min(520px,92vw);background:#fff;border-radius:16px;padding:18px;border:2px solid rgba(0,0,0,.06);box-shadow:0 14px 36px rgba(0,0,0,.25);}
+    .dialog h3{margin-bottom:8px;font-size:18px}
+    .dialog p{color:#444}
+    .dialog .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+    .danger{color:#b91c1c;font-weight:700}
+    /* ===== ESTILOS PARA LA TARJETA DE SUSCRIPCIÓN ===== */
+.subscription-card {
+  background: #fff;
+  border: 1px dashed rgba(var(--brand-rgb), 0.4);
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px; /* Espacio extra arriba */
+}
+.subscription-card__title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.subscription-card__status {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 16px;
+}
+.subscription-card__status b {
+  font-weight: 700;
+}
+.subscription-card__action {
+  display: block; /* Ocupa todo el ancho */
+  width: 100%;
+  padding: 12px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+/* Estilo especial para cuando el plan ha expirado */
+.subscription-card--expired {
+  background: #fff5f5;
+  border-color: #ef4444;
+}
+.subscription-card--expired .subscription-card__title {
+  color: #b91c1c;
+}
+.subscription-card--expired .subscription-card__action {
+  background: #ef4444;
+}
+  </style>
+</head>
+<body>
+  <main class="phone">
+
+    <!-- ===== AÑADE ESTE CÓDIGO AQUÍ ===== -->
+    <div id="loader" class="loader-container">
+      <div class="loader-spinner"></div>
+      <p>Cargando...</p>
+    </div>
+    
+    <div class="page-cover" id="pageCover" aria-hidden="true"></div>
+    <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--tl">
+    <img src="./assets.svg" alt="" aria-hidden="true" class="leaf leaf--br">
+    <div class="bg-deco bg-deco--tl" aria-hidden="true"></div>
+    <div class="bg-deco bg-deco--br" aria-hidden="true"></div>
+
+    <!-- Header igual a agenda -->
+    <header class="banner" id="banner">
+      <div class="banner__row">
+        <img id="bizLogo" class="avatar" src="./assets/logo.svg" alt="Logo" />
+        <div class="banner__name" id="bizName">Mi negocio</div>
+        <button id="menuBtn" class="icon-btn menu-btn" aria-label="Menú" aria-haspopup="menu" aria-expanded="false">⋮</button>
+        <nav id="menuPanel" class="menu-panel" hidden role="menu" aria-labelledby="menuBtn">
+          <a role="menuitem" href="./agenda.html">Inicio</a>
+          <a role="menuitem" href="./realizadas.html">Citas realizadas</a>
+          <a role="menuitem" href="./canceladas.html">Citas canceladas</a>
+          <a role="menuitem" href="./servicios.html">Servicios</a>
+          <a role="menuitem" href="./horarios.html">Horarios y bloqueos</a>
+          <a role="menuitem" href="./configuracion.html">Configuración</a>
+          <button role="menuitem" type="button" class="menu-logout" data-action="logout">Cerrar sesión</button>
+        </nav>
+      </div>
+    </header>
+
+    <section class="settings">
+      <h1>Configuración</h1>
+
+      <!-- PEGA ESTE BLOQUE AQUÍ -->
+
+<!-- ===== TARJETA DE ESTADO DE SUSCRIPCIÓN ===== -->
+<div id="subscriptionCard" class="subscription-card" style="display: none;"> <!-- Oculta por defecto -->
+  <h2 id="subscriptionTitle" class="subscription-card__title">Mi Plan</h2>
+  <p id="subscriptionStatus" class="subscription-card__status">Cargando estado...</p>
+  <a id="subscriptionAction" href="#" class="subscription-card__action">Gestionar Suscripción</a>
+</div>
+<!-- ============================================= -->
+      <div class="set-list">
+        <a class="set-item" href="./personalizacion.html">
+          <span class="label">Perfil de negocio</span><span class="chev">›</span>
+        </a>
+
+        <!-- ===== AÑADE ESTE BOTÓN ===== -->
+<button class="set-item" id="helpBtn" type="button">
+  <span class="label">Centro de ayuda</span><span class="chev">›</span>
+</button>
+<!-- ========================== -->
+
+        <button class="set-item" id="pwBtn" type="button">
+  <span class="label">Cambiar contraseña</span><span class="chev">›</span>
+</button>
+
+        <button class="set-item" id="delBtn" type="button">
+          <span class="label" style="color:#b91c1c;">Eliminar cuenta</span><span class="chev">›</span>
+        </button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" hidden role="alert" aria-live="assertive"></div>
+
+    <!-- Modal eliminar -->
+    <div id="delBackdrop" class="backdrop" aria-hidden="true">
+      <div class="dialog" role="dialog" aria-modal="true">
+        <h3 class="danger">¿Eliminar cuenta?</h3>
+        <p>Se eliminarán tus <b>citas</b>, <b>servicios</b>, <b>horarios</b>, <b>bloqueos</b> y <b>perfil</b>. Esta acción no se puede deshacer.</p>
+        <div class="actions">
+          <button id="delCancel" class="btn-small btn-ghost" type="button">Cancelar</button>
+          <button id="delConfirm" class="btn-small btn-danger" type="button">Confirmar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal ayuda -->
+    <div id="helpBackdrop" class="backdrop" aria-hidden="true">
+      <div class="dialog" role="dialog" aria-modal="true">
+        <h3>Centro de ayuda</h3>
+        <p>Cuéntanos tu caso y te escribiremos pronto.</p>
+        <div class="pw-row" style="margin-top:10px;">
+          <label class="label" for="helpEmail">Tu correo</label>
+          <input id="helpEmail" class="input" type="email" placeholder="tu-correo@example.com" />
+        </div>
+        <div class="pw-row">
+          <label class="label" for="helpMsg">Mensaje</label>
+          <textarea id="helpMsg" class="textarea" rows="4" placeholder="¿En qué necesitas ayuda?"></textarea>
+        </div>
+        <div class="actions">
+          <button id="helpCancel" class="btn-small btn-ghost" type="button">Cancelar</button>
+          <button id="helpSend" class="btn-small" type="button">Enviar</button>
+        </div>
+      </div>
+    </div>
+    <!-- ===== PEGA EL NUEVO CÓDIGO AQUÍ ===== -->
+<!-- Modal cambiar contraseña -->
+<div id="pwBackdrop" class="backdrop" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true">
+    <h3>Cambiar contraseña</h3>
+    <div class="pw-row" style="margin-top:10px;">
+      <label class="label" for="newPw">Nueva contraseña</label>
+      <input id="newPw" class="input" type="password" placeholder="Mínimo 6 caracteres" />
+    </div>
+    <div class="pw-row">
+      <label class="label" for="newPw2">Repetir contraseña</label>
+      <input id="newPw2" class="input" type="password" placeholder="Repite tu contraseña" />
+    </div>
+    <div class="actions">
+      <button id="pwCancel" class="btn-small btn-ghost" type="button">Cancelar</button>
+      <button id="pwSave" class="btn-small" type="button">Guardar</button>
+    </div>
+  </div>
+</div>
+  </main>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="./supabaseClient.js"></script>
+  <script>
+  (async () => {
+    const $ = (id)=>document.getElementById(id);
+    function hexToRgb(hex){const n=hex.replace('#','');const big=parseInt(n.length===3?n.split('').map(c=>c+c).join(''):n.slice(0,6),16);return{r:(big>>16)&255,g:(big>>8)&255,b:big&255};}
+    function toast(msg,type='info',ms=2200){const t=$('toast');if(!t)return;t.textContent=msg;t.className=`toast toast--${type} is-visible`;t.hidden=false;clearTimeout(window._to);window._to=setTimeout(()=>{t.classList.remove('is-visible');t.hidden=true;},ms);}
+    // sesión
+    const { data: u } = await sb.auth.getUser();
+    if(!u?.user){ location.href='login.html'; return; }
+    const userId = u.user.id;
+    const userEmail = u.user.email || '';
+
+    // tema/negocio
+    const { data: biz } = await sb.from('businesses').select('*, subscription_status, current_period_ends_at').eq('user_id', userId).order('updated_at',{ascending:false}).limit(1).maybeSingle();
+    if(!biz){ location.href='personalizacion.html'; return; }
+    const brand=(biz.brand||'#DD338B').toUpperCase(); const {r,g,b}=hexToRgb(brand);
+    const root=document.documentElement; root.style.setProperty('--brand',brand); root.style.setProperty('--brand-rgb',`${r} ${g} ${b}`); root.style.setProperty('--bg',biz.bg_pastel||'#FAE9F2');
+    $('bizName').textContent=biz.business_name||'Mi negocio';
+    const logoEl=$('bizLogo'); logoEl.src=biz.logo_url||'./assets/logo.svg'; logoEl.onerror=()=>{logoEl.src='./assets/logo.svg';};
+    if(biz.cover_url){ $('pageCover').style.backgroundImage=`url('${biz.cover_url}')`; const banner=$('banner'); banner.style.setProperty('--cover-url',`url('${biz.cover_url}')`); banner.classList.add('banner--with-cover'); }
+
+
+
+    // PEGA ESTE BLOQUE JUSTO DESPUÉS DE LA VERIFICACIÓN DE 'biz'
+
+// ==========================================================
+// ===== LÓGICA PARA LA TARJETA DE SUSCRIPCIÓN =====
+// ==========================================================
+const subscriptionCard = document.getElementById('subscriptionCard');
+const subscriptionTitle = document.getElementById('subscriptionTitle');
+const subscriptionStatus = document.getElementById('subscriptionStatus');
+const subscriptionAction = document.getElementById('subscriptionAction');
+
+// Hacemos visible la tarjeta
+subscriptionCard.style.display = 'block';
+
+const status = biz.subscription_status;
+const endDate = new Date(biz.current_period_ends_at);
+const now = new Date();
+const formattedEndDate = endDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+const wompiLink = "URL_DEL_LINK_DE_PAGO_DE_WOMPI"; // <-- ¡RECUERDA PONER TU LINK AQUÍ!
+
+subscriptionAction.href = wompiLink;
+
+if (status === 'trial') {
+    subscriptionTitle.textContent = "Estás en tu Periodo de Prueba";
+    if (now < endDate) {
+        subscriptionStatus.innerHTML = `Tu acceso completo termina el <b>${formattedEndDate}</b>.`;
+        subscriptionAction.textContent = "Activar Plan Completo";
+    } else {
+        subscriptionCard.classList.add('subscription-card--expired');
+        subscriptionTitle.textContent = "Tu prueba ha terminado";
+        subscriptionStatus.textContent = "Activa un plan para seguir usando todas las funciones.";
+        subscriptionAction.textContent = "Activar mi Plan Ahora";
+    }
+} else if (status === 'active') {
+    if (now < endDate) {
+        subscriptionTitle.textContent = "Tu Plan está Activo";
+        subscriptionStatus.innerHTML = `Tu próximo pago es el <b>${formattedEndDate}</b>.`;
+        subscriptionAction.textContent = "Gestionar Suscripción";
+    } else {
+        subscriptionCard.classList.add('subscription-card--expired');
+        subscriptionTitle.textContent = "Tu Plan ha Expirado";
+        subscriptionStatus.textContent = "Renueva tu plan para no detener tu negocio.";
+        subscriptionAction.textContent = "Renovar Ahora";
+    }
+} else {
+    // Por si acaso hay otro estado, mostramos la opción de activar
+    subscriptionCard.classList.add('subscription-card--expired');
+    subscriptionTitle.textContent = "Activa tu Plan";
+    subscriptionStatus.textContent = "Empieza a disfrutar de todos los beneficios de StyleTime.";
+    subscriptionAction.textContent = "Ver Planes y Pagar";
+}
+// ========================================================
+// ===== FIN DE LA LÓGICA DE LA TARJETA =====
+// ========================================================
+
+    // menú tres puntos
+    const menuBtn=$('menuBtn'), menuPanel=$('menuPanel');
+    function closeMenu(){ if(menuPanel.hidden) return; menuPanel.hidden=true; menuBtn.setAttribute('aria-expanded','false'); }
+    menuBtn.addEventListener('click',(e)=>{ e.stopPropagation(); const open=menuPanel.hidden; menuPanel.hidden=!open; menuBtn.setAttribute('aria-expanded',String(open)); });
+    document.addEventListener('click',(e)=>{ if(!menuPanel.hidden && !menuPanel.contains(e.target) && e.target!==menuBtn){ closeMenu(); }});
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') closeMenu(); });
+    menuPanel.addEventListener('click', async (e)=>{ if(e.target?.dataset?.action==='logout'){ try{ await sb.auth.signOut(); location.href='login.html'; }catch(err){ console.error(err); }}});
+
+    // ===== PEGA ESTE NUEVO CÓDIGO EN SU LUGAR =====
+// --- Cambiar contraseña (modal) ---
+const pwBtn = document.getElementById('pwBtn');
+const pwBackdrop = document.getElementById('pwBackdrop');
+const pwCancel = document.getElementById('pwCancel');
+const pwSave = document.getElementById('pwSave');
+
+pwBtn.addEventListener('click', () => {
+  document.getElementById('newPw').value = '';
+  document.getElementById('newPw2').value = '';
+  pwBackdrop.style.display = 'flex';
+});
+
+pwCancel.addEventListener('click', () => {
+  pwBackdrop.style.display = 'none';
+});
+
+pwBackdrop.addEventListener('click', (e) => {
+  if (e.target === pwBackdrop) pwBackdrop.style.display = 'none';
+});
+
+pwSave.addEventListener('click', async () => {
+  const p1 = document.getElementById('newPw').value.trim();
+  const p2 = document.getElementById('newPw2').value.trim();
+
+  if (p1.length < 6) { toast('La contraseña debe tener al menos 6 caracteres','error'); return; }
+  if (p1 !== p2) { toast('Las contraseñas no coinciden','error'); return; }
+
+  try {
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    if (error) throw error;
+    toast('Contraseña actualizada','ok',1400);
+    pwBackdrop.style.display = 'none';
+  } catch (err) {
+    console.error(err);
+    toast('No se pudo actualizar la contraseña','error');
+  }
+});
+// ============================================
+
+    // --- Eliminar cuenta (modal) ---
+    const delBackdrop=$('delBackdrop');
+    $('delBtn').addEventListener('click', ()=> delBackdrop.style.display='flex');
+    $('delCancel').addEventListener('click', ()=> delBackdrop.style.display='none');
+    delBackdrop.addEventListener('click',(e)=>{ if(e.target===delBackdrop) delBackdrop.style.display='none'; });
+    $('delConfirm').addEventListener('click', async ()=>{
+      try{
+        const tables=['appointments','services','working_hours','day_blocks','businesses'];
+        for(const t of tables){ const { error }=await sb.from(t).delete().eq('user_id',userId); if(error) console.warn('No se pudo borrar en',t,error.message); }
+        await sb.auth.updateUser({ data:{ deleted_at:new Date().toISOString() }});
+        toast('Cuenta eliminada. Cerrando sesión…','ok',1200);
+        setTimeout(async()=>{ await sb.auth.signOut(); location.href='login.html'; },1200);
+      }catch(err){ console.error(err); toast('No se pudo eliminar la cuenta','error'); }
+      finally{ delBackdrop.style.display='none'; }
+    });
+
+   // PEGA ESTE NUEVO BLOQUE EN LUGAR DEL ANTERIOR
+
+// --- Centro de ayuda (modal con mailto:) ---
+const helpBackdrop = $('helpBackdrop');
+$('helpBtn').addEventListener('click', () => {
+    $('helpEmail').value = userEmail; // Autocompleta con el correo del usuario
+    $('helpMsg').value = '';
+    helpBackdrop.style.display = 'flex';
+});
+
+$('helpCancel').addEventListener('click', () => helpBackdrop.style.display = 'none');
+helpBackdrop.addEventListener('click', (e) => {
+    if (e.target === helpBackdrop) helpBackdrop.style.display = 'none';
+});
+
+$('helpSend').addEventListener('click', () => {
+    const email = $('helpEmail').value.trim();
+    const msg = $('helpMsg').value.trim();
+
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        toast('Escribe un correo válido', 'error');
+        return;
+    }
+    if (msg.length < 10) {
+        toast('Cuéntanos con más detalle (mín. 10 caracteres)', 'error');
+        return;
+    }
+
+    // ===== ¡¡¡ IMPORTANTE: PON TU CORREO DE SOPORTE AQUÍ !!! =====
+    const tuCorreoDeSoporte = 'luzantienda@gmail.com'; 
+    // ===============================================================
+
+    const subject = encodeURIComponent(`Solicitud de Soporte - ${email}`);
+    const body = encodeURIComponent(
+        `Un usuario ha enviado una solicitud de soporte desde la app StyleTime:\n\n` +
+        `----------------------------------\n` +
+        `Correo del Usuario: ${email}\n` +
+        `ID de Usuario: ${userId}\n` +
+        `----------------------------------\n\n` +
+        `Mensaje:\n${msg}`
+    );
+
+    // Creamos y abrimos el enlace mailto:
+    window.location.href = `mailto:${tuCorreoDeSoporte}?subject=${subject}&body=${body}`;
+
+    toast('Se abrirá tu aplicación de correo para que envíes el mensaje.', 'ok', 3000);
+    
+    // Cerramos el modal después de un momento
+    setTimeout(() => {
+        helpBackdrop.style.display = 'none';
+    }, 800);
+});
+     document.getElementById('loader').classList.add('hidden');
+  })();
+  </script>
+</body>
+</html>
