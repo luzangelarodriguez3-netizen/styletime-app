@@ -56,6 +56,13 @@
         return;
       }
 
+      if (pass.length < 8) {
+  const m = 'Para mayor seguridad, tu contraseña debe tener al menos 8 caracteres.';
+  showToast(m, 'error', 3000);
+  msg.textContent = m;
+  return; // Detiene el proceso de registro
+}
+
       try {
         const { error: signUpError } = await sb.auth.signUp({ email, password: pass });
         if (signUpError) {
