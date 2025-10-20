@@ -11,7 +11,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="./styles.css" />
+ <link rel="stylesheet" href="./css/main.css" />
+
+ <!-- ===== PWA / APP INSTALABLE ===== -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#DD338B">
+  
 </head>
 <body>
   <!-- Lienzo móvil (simula teléfono 390px) -->
@@ -48,5 +53,17 @@
   </main>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="./supabaseClient.js"></script>
+
+
+<!-- ===== REGISTRO DEL SERVICE WORKER (PWA) ===== -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('Service Worker registrado con éxito:', registration))
+          .catch(registrationError => console.log('Fallo en el registro del Service Worker:', registrationError));
+      });
+    }
+  </script>
 </body>
 </html>

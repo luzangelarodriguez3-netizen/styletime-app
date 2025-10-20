@@ -133,8 +133,9 @@ body {
 .actions {
   margin-top: var(--space-4);
   display: grid; gap: var(--space-3);
-  justify-items: center;
-  position: relative; z-index: 2;
+ 
+  position: relative; 
+  z-index: 2;
 }
 .btn{
   min-width: 220px;
@@ -151,6 +152,11 @@ body {
 .btn:active { transform: translateY(0); }
 .btn-primary { color: var(--brand); }
 .btn-outline { color: var(--brand); }
+
+/* Regla específica para centrar los botones del Hero en index.html */
+.hero > .actions {
+  justify-items: center;
+}
 
 /* ========= Footer ========= */
 .legal {
@@ -1117,3 +1123,680 @@ body{
   pointer-events: none; /* Evita que se pueda interactuar con él cuando es invisible */
 }
 
+
+/* estilos de agenda.html*/
+
+   /* 1) Permitir clic en días pasados (siguen grises, pero clickeables) */
+    .day.is-past{
+      cursor: pointer;
+      pointer-events: auto; /* override de estilos anteriores */
+    }
+
+    /* 2) Tarjeta vencida (ya pasó la hora fin) con texto legible */
+    .appt.appt--expired{
+      background:#e5e7eb !important;   /* gris claro */
+      color:#111 !important;            /* texto negro */
+      opacity: .98;
+    }
+    .appt.appt--expired *{
+      color:#111 !important;
+    }
+    .appt.appt--expired .appt__time{
+      background:#fff !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+
+    /* 3) Botones de estado en el modal */
+    .btn-status{
+      display:inline-block;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(var(--brand-rgb, 221 51 139) / .18);
+      background:#f3f4f6;    /* gris claro base */
+      color:#111;
+      font-weight:700;
+    }
+    .btn-status + .btn-status{ margin-left: 12px; }
+
+    /* estado activo por tipo */
+    .btn-confirmed.is-active{ background:#fde68a; border-color:#f59e0b; }  /* amarillo */
+    .btn-done.is-active{ background:#86efac; border-color:#22c55e; }       /* verde */
+    .btn-cancelled.is-active{ background:#ef4444; border-color:#b91c1c; color:#fff; } /* rojo */
+
+    /* chips/inputs del modal */
+    .appt-chip{
+      display:inline-block; padding: 8px 12px; border-radius:10px;
+      background:#fff; border:1px solid rgba(0,0,0,.08); font-weight:700;
+    }
+    .appt-field{
+      margin-top:8px; padding:10px 12px; border-radius:10px;
+      background:rgba(255,255,255,.65); border:1px solid rgba(0,0,0,.06);
+      font-size:13px; color:#444;
+    }
+
+    /* Backdrop y contenedor del diálogo (ya tenías estilos globales; por si acaso) */
+    .appt-backdrop{
+      position: fixed; inset:0; background: rgba(0,0,0,.35);
+      display:grid; place-items:center; z-index: 9998;
+    }
+    .appt-dialog{
+      width:min(680px, 92vw);
+      background: var(--brand, #DD338B);
+      color:#fff;
+      border-radius:16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.25);
+      padding: 18px;
+    }
+    .appt-dialog__head{ display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:flex-start; margin-bottom:12px; }
+    .appt-dialog__name{ font-weight:700; }
+    .appt-dialog__name small{ display:block; font-weight:600; opacity:.9; }
+    .appt-dialog__time{
+      background:#fff; color:#111; font-weight:700; border-radius:12px;
+      padding:8px 10px; border:1px solid rgba(0,0,0,.06);
+    }
+    .appt-dialog__actions{
+  display:grid;
+  grid-template-columns: 1fr 1fr; /* <--- CORREGIDO para 2 botones */
+  gap:12px;
+  margin-top:12px;
+}
+    .appt-dialog__footer{ display:flex; justify-content:flex-end; margin-top:12px; }
+    .appt-close{
+      background:#fff; color:#111; border:1px solid rgba(0,0,0,.06);
+      border-radius:12px; padding:8px 14px; font-weight:700;
+    }
+
+    /* Pega este nuevo estilo al final de la sección <style> */
+
+/* 4) Estilo para tarjetas canceladas */
+.appt.appt--cancelled {
+  background: #fee2e2 !important; /* Un rojo muy pálido */
+  color: #7f1d1d !important;      /* Texto rojo oscuro */
+  opacity: .95;
+}
+.appt.appt--cancelled * {
+  color: #7f1d1d !important;
+}
+.appt.appt--cancelled .appt__time {
+  background: #fff !important;
+  border: 1px solid #fecaca !important;
+}
+/* Pega este nuevo estilo al final de la sección <style> */
+
+/* 5) Estilo para el contenedor de acciones en la tarjeta */
+.appt__actions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Estilo del botón de recordatorio */
+.btn-reminder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #e0f2fe; /* Azul cielo pálido */
+  color: #0c4a6e; /* Azul oscuro */
+  border: 1px solid #bae6fd;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Estilo para la campanita de aviso */
+.appt::before {
+  content: '🔔';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 16px;
+  opacity: 0;
+  transform: scale(0.5) rotate(20deg);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Clase que activa la visibilidad de la campanita */
+.appt.is-due::before {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  animation: ring-animation 1.5s 2s ease-in-out infinite;
+}
+
+/* Animación para que la campana llame la atención */
+@keyframes ring-animation {
+  0%, 100% { transform: rotate(0); }
+  10% { transform: rotate(15deg); }
+  20% { transform: rotate(-10deg); }
+  30% { transform: rotate(5deg); }
+  40% { transform: rotate(-2deg); }
+  50% { transform: rotate(0); }
+}
+
+
+/* estilos de canceladas.html*/
+
+/* Estilo para tarjetas canceladas */
+  .appt.appt--cancelled {
+    background: #fee2e2 !important; /* Un rojo muy pálido */
+    color: #7f1d1d !important;      /* Texto rojo oscuro */
+    opacity: .95;
+  }
+  .appt.appt--cancelled * {
+    color: #7f1d1d !important;
+  }
+  .appt.appt--cancelled .appt__time {
+    background: #fff !important;
+    border: 1px solid #fecaca !important;
+  }
+
+  /* estilos configuracion.html*/
+
+   .settings{position:relative;z-index:1;max-width:760px;margin:12px auto 40px;padding:16px;border-radius:16px;background:rgba(var(--brand-rgb,221 51 139)/.10);border:1px solid rgba(var(--brand-rgb,221 51 139)/.25);box-shadow:var(--elev-1);}
+    .settings h1{font-size:20px;font-weight:700;margin:6px 4px 14px;}
+    .set-list{display:grid;gap:10px;}
+    .set-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 10px rgba(0,0,0,.04);cursor:pointer;}
+    .set-item:hover{filter:brightness(1.02);}
+    .set-item .label{font-weight:600;color:#1f2937;}
+
+    a.set-item {text-decoration: none;}
+    .set-item .chev{opacity:.6;}
+    .pw-form{margin-top:8px;padding:12px;border-radius:12px;background:#fff;border:1px dashed rgba(var(--brand-rgb)/.35);display:grid;gap:10px;}
+    .pw-row{display:grid;gap:6px;}
+    .pw-actions{display:flex;gap:10px;justify-content:flex-end;}
+    .btn-small{border-radius:999px;padding:8px 14px;font-weight:700;border:0;cursor:pointer;box-shadow:0 8px 22px rgba(var(--brand-rgb)/.35);background:var(--brand);color:#fff;}
+    .btn-ghost{background:#fff;color:#111;border:1px solid rgba(0,0,0,.12);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+    .btn-danger{background:#b91c1c;color:#fff;}
+    /* Backdrops / dialogs */
+    .backdrop{position:fixed;inset:0;z-index:1000;display:none;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+    .dialog{width:min(520px,92vw);background:#fff;border-radius:16px;padding:18px;border:2px solid rgba(0,0,0,.06);box-shadow:0 14px 36px rgba(0,0,0,.25);}
+    .dialog h3{margin-bottom:8px;font-size:18px}
+    .dialog p{color:#444}
+    .dialog .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+    .danger{color:#b91c1c;font-weight:700}
+    /* ===== ESTILOS PARA LA TARJETA DE SUSCRIPCIÓN ===== */
+.subscription-card {
+  background: #fff;
+  border: 1px dashed rgba(var(--brand-rgb), 0.4);
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px; /* Espacio extra arriba */
+}
+.subscription-card__title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.subscription-card__status {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 16px;
+}
+.subscription-card__status b {
+  font-weight: 700;
+}
+.subscription-card__action {
+  display: block; /* Ocupa todo el ancho */
+  width: 100%;
+  padding: 12px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+/* Estilo especial para cuando el plan ha expirado */
+.subscription-card--expired {
+  background: #fff5f5;
+  border-color: #ef4444;
+}
+.subscription-card--expired .subscription-card__title {
+  color: #b91c1c;
+}
+.subscription-card--expired .subscription-card__action {
+  background: #ef4444;
+}
+
+/* estilos horarios.html*/
+
+ .page-cover{ position: fixed; inset: 0; background-size: cover; background-position:center; z-index:0; filter:saturate(.96) contrast(.98) brightness(.98);}
+    .phone::before{ content:""; position:fixed; inset:0; z-index:0; background: color-mix(in oklab, var(--bg) 82%, transparent); backdrop-filter: blur(2px); }
+
+    .wrap{
+      position: relative; z-index:1;
+      margin: 12px 12px 80px; padding: 14px 16px; border-radius: 16px;
+      background: rgba(var(--brand-rgb,221 51 139) / .10);
+      border: 1px solid rgba(var(--brand-rgb,221 51 139)/.18);
+      box-shadow: 0 8px 22px rgba(0,0,0,.06);
+      backdrop-filter: blur(6px);
+      max-width: 760px;
+      margin-left: auto; margin-right: auto;
+    }
+    .grid-rows{ display:grid; gap:10px; }
+    .row{
+      display:grid; grid-template-columns: 80px 1fr 1fr; gap:10px;
+      align-items:center; background:#fff; border:1px solid rgba(0,0,0,.06);
+      border-radius:12px; padding:8px 10px; box-shadow:0 2px 10px rgba(0,0,0,.06);
+    }
+    .row.disabled{ opacity:.55; }
+    .row label{ display:flex; gap:8px; align-items:center; font-weight:600; }
+    .row input[type="time"]{
+      width:100%; height:42px; border-radius:10px; border:1px solid var(--border);
+      padding:0 10px; background:#fff; font: 500 14px/1 var(--font-sans);
+    }
+
+    .blocks{ display:grid; gap:10px; margin-top:12px; }
+    .blocks__add{
+      display:grid; grid-template-columns: 1fr auto; gap:10px;
+      background:#fff; padding:8px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+    }
+    .blocks__chips{ display:flex; gap:8px; flex-wrap:wrap; }
+    .chip{
+      background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:8px 10px; display:flex; gap:8px; align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.05);
+    }
+    .chip button{ border:0; background:rgba(185 28 28 /.10); color:#b91c1c; border-radius:8px; padding:4px 8px; cursor:pointer; }
+
+    .btn{
+      height:42px; padding:0 16px; border-radius:999px; font-weight:600; cursor:pointer;
+      border:1px solid rgba(var(--brand-rgb)/.45); color:var(--brand); background:#fff;
+    }
+    .btn-primary{ color:#fff; background:var(--brand); border-color: color-mix(in oklab, var(--brand) 70%, #000); }
+    .actions{ margin-top:12px; display:flex; justify-content:flex-end; gap:10px; }
+
+    /* Banner + menú (idéntico a agenda/servicios) */
+    .banner{
+      position: relative; margin: 12px 12px 8px; padding: 14px 16px; border-radius: 16px;
+      background: var(--bg); box-shadow: 0 8px 22px rgba(0,0,0,.06); 
+    }
+    .banner.banner--with-cover::before{
+      content:""; position:absolute; inset:0; background-image:var(--cover-url); background-size:cover; background-position:center;
+      filter: blur(2px); opacity:.28;
+    }
+    .banner.banner--with-cover::after{
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(to bottom, rgba(var(--brand-rgb)/.10), rgba(255 255 255 /.15));
+      pointer-events:none;
+    }
+    .banner__row{ position:relative; z-index:1; display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; }
+    .avatar{ width:40px; height:40px; border-radius:999px; object-fit:cover; border:2px solid rgba(255,255,255,.7); box-shadow:0 2px 8px rgba(0,0,0,.10);}
+    .banner__name{ font-weight:600; color:#1a1a1a; }
+    .menu-btn{
+      font-size:22px; line-height:1; width:40px; height:40px; border-radius:999px; border:0; cursor:pointer; display:grid; place-items:center;
+      backdrop-filter: blur(6px); background: rgba(var(--brand-rgb,96 96 96) /.15); color:#111;
+      box-shadow:0 2px 10px rgba(0,0,0,.10), inset 0 0 0 1px rgba(255,255,255,.4);
+    }
+    .menu-btn:hover{ background: rgba(var(--brand-rgb,96 96 96) /.25); }
+    .menu-panel{
+      position:absolute; right:12px; top:56px; min-width:220px; border-radius:16px; padding:8px;
+      background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.18); border:1px solid rgba(0,0,0,.06); z-index:1000;
+    }
+    .menu-panel[hidden]{ display:block !important; visibility:hidden; opacity:0; transform:translateY(-8px); pointer-events:none; transition:opacity .2s, transform .2s, visibility .2s; }
+    .menu-panel:not([hidden]){ visibility:visible; opacity:1; transform:none; }
+    .menu-panel a, .menu-panel button{
+      all:unset; display:block; width:100%; padding:10px 12px; border-radius:10px; font-size:14px; color:#1f2937; cursor:pointer;
+    }
+    .menu-panel a:hover, .menu-panel button:hover{ background: rgba(var(--brand-rgb,96 96 96) /.10); }
+    .menu-panel .menu-logout{ color:#b91c1c; font-weight:600; border-top:1px solid rgba(0,0,0,.06); margin-top:4px; padding-top:10px; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 767px) {
+      .wrap { margin-left: 8px; margin-right: 8px; }
+      .row {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "day day"
+          "start-time end-time";
+        padding: 12px; row-gap: 10px;
+      }
+      .row label { grid-area: day; font-size: 16px; }
+      .row input[type="time"]:nth-of-type(1) { grid-area: start-time; }
+      .row input[type="time"]:nth-of-type(2) { grid-area: end-time; }
+      .blocks__add { grid-template-columns: 1fr; }
+      .blocks__add .btn { width: 100%; }
+      .actions { justify-content: stretch; }
+      .actions .btn { width: 100%; }
+    }
+
+    /* estilos de personalizacion.html*/
+
+    .logo-picker{position:relative;width:96px;height:96px;border-radius:50%;overflow:hidden;display:flex;justify-content:center;align-items:center;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+    .logo-picker img{width:100%;height:100%;object-fit:cover;object-position:center}
+    .logo-picker input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .bg-thumb{width:100%;max-width:240px;border-radius:16px;border:1px solid var(--border);background:#fdfdfd;background-size:contain;background-repeat:no-repeat;background-position:center;aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden;margin-bottom:10px}
+    .bg-thumb img{width:100%;height:auto;border-radius:12px}
+
+    /* estilos de registro.html*/
+
+    .terms-field {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 16px;
+      margin-bottom: 20px;
+    }
+    /* REEMPLAZA EL CÓDIGO ANTERIOR CON ESTE */
+.terms-field input[type="checkbox"] {
+  /* Hacemos el checkbox más grande */
+  width: 18px;
+  height: 18px;
+  
+  /* Lo alineamos mejor con el texto */
+  margin-top: 3px; 
+  
+  /* Hacemos que sea más obvio que se puede hacer clic */
+  cursor: pointer;
+}
+    .terms-field label {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+    .terms-field label a {
+      color: var(--brand, #DD338B);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    /* Estilo para el botón cuando está deshabilitado */
+    button:disabled {
+      background-color: #9ca3af !important;
+      border-color: #9ca3af !important;
+      color: #e5e7eb !important;
+      cursor: not-allowed !important;
+      box-shadow: none !important;
+    }
+
+    /* estilos de reserva.html*/
+
+    :root{
+      --font: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --brand: #DD338B;
+      --brand-rgb: 221 51 139;
+      --bg: #FAE9F2;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+    }
+    *{ box-sizing: border-box; margin:0; padding:0; }
+    html,body{ height:100%; }
+    body{ font-family:var(--font); color:var(--text); background:#f3f3f3; min-height:100dvh; }
+    .phone{ position:relative; min-height:100dvh; overflow-x:hidden; overflow-y:auto; }
+    .page-cover{ position:fixed; inset:0; background-position:center; background-size:cover; background-repeat:no-repeat; filter:saturate(.96) contrast(.98) brightness(.98); z-index:0; }
+    .phone::before{ content:""; position:fixed; inset:0; z-index:0; background: color-mix(in oklab, var(--bg) 82%, transparent); backdrop-filter: blur(2px); }
+    .form-card{ position:relative; z-index:1; width:min(980px, 92vw); margin:28px auto; padding:16px 18px 20px; border-radius:16px; background: rgba(var(--brand-rgb, 221 51 139) / .14); border:1px solid rgba(var(--brand-rgb, 221 51 139) / .35); box-shadow:0 12px 28px rgba(0,0,0,.18); backdrop-filter:blur(8px) saturate(1.05); }
+    .biz-head{ display:grid; grid-template-columns:48px 1fr; align-items:center; gap:10px; margin-bottom:12px; }
+    .biz-head__logo{ width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:center;background:#fff;border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    .biz-head__name{ font-weight:700; letter-spacing:.2px; }
+    .biz-head__subtitle{ font-size:12px; color:var(--muted); margin-top:2px; }
+    .form{ display:grid; gap:10px; }
+    .field{ display:grid; gap:6px; }
+    .label{ font-size:12px; color:#333; }
+    .input,.select,.textarea{ width:100%; font:400 14px/1.35 var(--font); padding:12px 14px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; color:#222; outline:none; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .input[readonly]{ background:#f7f7f7; color:#444; cursor: default; }
+    .input::placeholder,.textarea::placeholder{ color:#9aa0a6; }
+    .row-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .hint{ font-size:12px; color:var(--muted); margin-top:2px; }
+    .slot-section{ display:grid; gap:8px; }
+    .slot-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .slot{ padding:10px 8px; border-radius:10px; text-align:center; cursor:pointer; user-select:none; background:#fff; border:1px solid rgba(0,0,0,.08); box-shadow:0 2px 8px rgba(0,0,0,.06); font-weight:600; color:#1f2937; }
+    .slot.is-selected{ background: rgba(var(--brand-rgb,221 51 139)/.16); border-color: rgba(var(--brand-rgb,221 51 139)/.55); color:#111; }
+    .actions{ display:flex; justify-content:flex-end; margin-top:10px; }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:999px; padding:10px 16px; font-weight:700; border:none; cursor:pointer; transition:filter .15s ease; box-shadow:0 8px 22px rgba(var(--brand-rgb,221 51 139)/.35); }
+    .btn-primary{ background:var(--brand); color:#fff; }
+    .btn:hover{ filter:brightness(1.03); }
+    .toast{ position:fixed; left:50%; top:14px; transform:translateX(-50%) translateY(-12px); min-width:min(92vw,520px); padding:12px 16px; border-radius:999px; color:#fff; font:600 14px/1 var(--font); background:rgba(17,17,17,.92); box-shadow:0 6px 20px rgba(0,0,0,.15); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:9999; }
+    .toast.is-visible{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast--error{ background:#d92d20; }
+    .toast--ok{ background: color-mix(in oklab, var(--brand) 70%, #1a1a1a); }
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); z-index:9998; display:none; align-items:center; justify-content:center; }
+    .modal{ position:relative; width:min(320px,90vw); padding:24px 20px 20px; text-align:center; background:rgba(255,255,255,0.85); border:2px dashed var(--brand); border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.2); overflow:hidden; }
+    .modal::after{ content:'✓'; position:absolute; bottom:-40px; left:50%; transform:translateX(-50%); font-size:180px; font-weight:700; line-height:1; color:var(--brand); opacity:0.15; z-index:-1; }
+    .modal h3{ font-size:24px; font-weight:700; margin-bottom:12px; color:var(--text); }
+    .confirm-details{ display:grid; gap:8px; margin-bottom:20px; font-size:16px; color:#333; }
+    .modal .ok{ width:100%; }
+    @media (max-width:520px){ .row-2{ grid-template-columns:1fr; } .slot-grid{ grid-template-columns:repeat(3,1fr); } }
+  
+
+
+
+
+    
+    /* estilos de servicio.html*/
+
+     /* ===== Cover y velo (mismo look de agenda) ===== */
+    .page-cover{
+      position: fixed; inset: 0;
+      background-size: cover; background-position: center;
+      filter: saturate(.96) contrast(.98) brightness(.98);
+      z-index: 0;
+    }
+    .phone::before{
+      content:""; position: fixed; inset: 0; z-index: 0;
+      background: color-mix(in oklab, var(--bg) 82%, transparent);
+      backdrop-filter: blur(2px);
+    }
+
+    /* ===== Banner reutilizable (igual a agenda) ===== */
+    .banner{
+      position: relative;
+      margin: 12px 12px 8px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--bg);
+      box-shadow: 0 8px 22px rgba(0,0,0,.06);
+      overflow: visible !important; /* FIX para que el menú no se corte */
+    }
+    .banner.banner--with-cover::before{
+      content: ""; position: absolute; inset: 0;
+      background-image: var(--cover-url);
+      background-size: cover; background-position: center;
+      filter: blur(2px); opacity: .28; pointer-events: none;
+    }
+    .banner.banner--with-cover::after{
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(var(--brand-rgb)/.10), rgba(255 255 255/.15));
+      pointer-events: none;
+    }
+    .banner__row{
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: auto 1fr auto;
+      gap: 10px; align-items: center;
+    }
+    .avatar{
+      width: 40px; height: 40px; border-radius: 999px;
+      object-fit: cover; object-position: center;
+      border: 2px solid rgba(255,255,255,.7);
+      box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    }
+    .banner__name{ font-weight: 600; color:#1a1a1a; }
+
+    /* Botón 3 puntos y panel (mismo de agenda) */
+    .menu-btn{
+      font-size: 22px; line-height: 1;
+      width: 40px; height: 40px; border-radius: 999px;
+      border: 0; cursor: pointer; display: grid; place-items: center;
+      backdrop-filter: blur(6px);
+      background: rgba(var(--brand-rgb, 96 96 96) / .15);
+      color: #111;
+      box-shadow: 0 2px 10px rgba(0,0,0,.10), inset 0 0 0 1px rgba(255,255,255,.4);
+      position: relative; z-index: 2;
+    }
+    .menu-btn:hover{ background: rgba(var(--brand-rgb, 96 96 96) / .25); }
+    .menu-panel{
+      position: absolute; right: 12px; top: 56px;
+      min-width: 220px; border-radius: 16px; padding: 8px;
+      background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+      border: 1px solid rgba(0,0,0,.06); z-index: 1000;
+    }
+    .menu-panel[hidden]{
+      display: block !important;
+      visibility: hidden; opacity: 0; transform: translateY(-8px);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease, visibility .2s;
+    }
+    .menu-panel:not([hidden]){ visibility: visible; opacity: 1; transform: none; }
+    .menu-panel a,
+    .menu-panel button{
+      all: unset; display:block; width:100%;
+      padding:10px 12px; border-radius:10px; font-size:14px; color:#1f2937; cursor:pointer;
+    }
+    .menu-panel a:hover,
+    .menu-panel button:hover{ background: rgba(var(--brand-rgb, 96 96 96) / .10); }
+    .menu-panel .menu-logout{ color:#b91c1c; font-weight:600; border-top:1px solid rgba(0,0,0,.06); margin-top:4px; padding-top:10px; }
+
+    /* ===== Estilos específicos de esta pantalla ===== */
+    .svc-wrap{
+      position: relative; z-index: 1;
+      margin: 12px auto 80px; padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(var(--brand-rgb, 221 51 139) / .10);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(var(--brand-rgb, 221 51 139) / .18);
+      box-shadow: 0 8px 22px rgba(0,0,0,.06); max-width: 760px;
+    }
+    .svc-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .svc-row--3{ grid-template-columns: 2fr 1fr 1fr; }
+    .svc-actions{ display:flex; gap:10px; justify-content:flex-end; }
+    .svc-btn{
+      height: 42px; padding: 0 16px; border-radius: 999px; font-weight: 600;
+      border: 1px solid rgba(var(--brand-rgb)/.45); color: var(--brand); background: #fff;
+      cursor: pointer;
+    }
+    .svc-btn--primary{
+      color:#fff; background: var(--brand);
+      border-color: color-mix(in oklab, var(--brand) 70%, #000);
+    }
+    .svc-list{ margin-top: 16px; display: grid; gap: 10px; }
+    .svc-item{
+      display: grid; grid-template-columns: 1fr 120px 110px auto; gap: 10px; align-items: center;
+      background: #fff; border: 1px solid rgba(0,0,0,.06); border-radius: 12px; padding: 10px 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    .svc-name{ font-weight: 700; }
+    .svc-price{ color: #1f2937; font-weight: 600; }
+    .svc-min{ color: #555; font-weight: 600; }
+    .svc-item .small-btn{
+      border-radius: 10px; padding: 8px 10px; border: 1px solid rgba(0,0,0,.08); cursor: pointer;
+      background: rgba(var(--brand-rgb) / .10); color: #1f2937; font-weight: 600;
+    }
+    .svc-item .small-btn:hover{ background: rgba(var(--brand-rgb)/.18); }
+    .svc-item .danger{ background: rgba(185 28 28 / .10); border-color: rgba(185 28 28 / .25); color: #b91c1c; }
+    .svc-item .danger:hover{ background: rgba(185 28 28 / .16); }
+    .svc-note{ font-size: 12px; color: #666; margin-top: 6px; }
+    .input--rect{ border-radius: 10px; }
+    .right{ text-align: right; }
+
+/* =============================================== */
+/* ===== REGLAS PARA PANTALLAS PEQUEÑAS (MÓVIL) ===== */
+/* =============================================== */
+
+/* Esto se aplica solo si la pantalla mide 767px o menos */
+@media (max-width: 767px) {
+
+  /* 1. Arregla el formulario para AÑADIR servicios */
+  .svc-row--3 {
+    /* En lugar de 3 columnas, haz que cada elemento ocupe su propia fila */
+    grid-template-columns: 1fr;
+  }
+
+  /* Alinea los botones del formulario a la izquierda en móvil */
+  .svc-row--3 .svc-actions {
+    justify-content: flex-start;
+  }
+
+  /* 2. Arregla la LISTA de servicios (el problema principal) */
+  .svc-item {
+    /* Cambiamos la cuadrícula de 4 columnas a una más flexible de 2x3 */
+    grid-template-columns: 1fr 1fr; /* Dos columnas de igual tamaño */
+    grid-template-areas:
+      "name    name"
+      "price   min"
+      "actions actions";
+    row-gap: 8px; /* Un poco de espacio vertical entre las filas */
+    padding: 14px;
+    text-align: left; /* Alineamos todo a la izquierda para consistencia */
+  }
+
+  /* Ahora asignamos cada pieza a su área en la nueva cuadrícula */
+  .svc-item .svc-name {
+    grid-area: name;
+    font-size: 16px; /* Hacemos el nombre un poco más grande */
+  }
+
+  .svc-item .svc-price {
+    grid-area: price;
+  }
+
+  .svc-item .svc-min {
+    grid-area: min;
+  }
+
+  /* El contenedor de los botones es el último hijo directo del item */
+  .svc-item > div:last-child {
+    grid-area: actions;
+    justify-content: flex-start; /* Alineamos los botones a la izquierda */
+    margin-top: 8px;
+  }
+}
+
+/* ================================================= */
+/* ===== FIX DEFINITIVO Y FORZADO: CENTRAR BOTONES ===== */
+/* ================================================= */
+
+/* Esta regla anula cualquier otra para los botones
+   de los formularios de inicio, registro y hero. */
+.hero > .actions,
+.screen > .form > .actions {
+  display: grid !important;
+  justify-content: center !important;
+  justify-items: center !important;
+}
+
+
+
+/* ================================================= */
+/* ===== FIX RESPONSIVE PARA EL FORMULARIO DE RESERVA ===== */
+/* ================================================= */
+
+/* Estas reglas se aplican solo a pantallas pequeñas (móviles) */
+@media (max-width: 520px) {
+  
+  /* 1. Hace que los campos en dos columnas (Precio/Duración)
+     ocupen su propia fila. */
+  .form-card .row-2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* 2. Cambia la parrilla de horarios de 4 a 3 columnas,
+     haciendo los botones un poco más grandes y fáciles de tocar. */
+  .form-card .slot-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================= */
+/* ===== FIX DEFINITIVO PARA EL PARPADEO DEL MODAL ===== */
+/* ============================================= */
+
+/* Por defecto, el modal está oculto y no se puede interactuar con él */
+.backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Cuando JavaScript le añada la clase 'is-visible', se mostrará */
+.backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
