@@ -54,16 +54,8 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="./supabaseClient.js"></script>
 
+<script src="./js/main.js"></script>
 
-<!-- ===== REGISTRO DEL SERVICE WORKER (PWA) ===== -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => console.log('Service Worker registrado con éxito:', registration))
-          .catch(registrationError => console.log('Fallo en el registro del Service Worker:', registrationError));
-      });
-    }
-  </script>
+
 </body>
 </html>
