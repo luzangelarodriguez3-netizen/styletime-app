@@ -2,7 +2,7 @@
   "name": "StyleTime",
   "short_name": "StyleTime",
   "description": "Tu agenda inteligente para gestionar las citas de tu negocio.",
-  "start_url": "./index.html",
+  "start_url": "https://styletimee.netlify.app/index.html",
   "display": "standalone",
   "background_color": "#FBE7F1",
   "theme_color": "#DD338B",
