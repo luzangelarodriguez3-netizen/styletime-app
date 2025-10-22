@@ -1,5 +1,15 @@
-// Este es un Service Worker básico.
-// Se puede mejorar en el futuro para que la app funcione offline.
-self.addEventListener('fetch', (event) => {
-  // Por ahora, no hace nada especial, solo existe.
+
+// Service Worker básico funcional
+
+self.addEventListener('install', event => {
+  console.log('Service Worker instalado');
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  console.log('Service Worker activado');
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(fetch(event.request));
 });
