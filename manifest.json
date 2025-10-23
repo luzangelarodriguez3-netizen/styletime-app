@@ -1,22 +1,29 @@
 {
-  "name": "StyleTime",
+  
   "short_name": "StyleTime",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "background_color": "#FBE7F1",
-  "theme_color": "#DD338B",
-  "orientation": "portrait-primary",
-  "icons": [
+  "name": "StyleTime - agenda de citas",
+ "icons": [
     {
-      "src": "/assets/icon-192.png",
+      "src": "assets/icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/assets/icon-512.png",
+      "src": "assets/icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "/index.html",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "theme_color": "#DD338B",
+  "orientation":"portrait",
+  "categories":["productivity",
+  "lifestyle",
+  "health",
+  "beauty"]  
+
+    
+  
 }

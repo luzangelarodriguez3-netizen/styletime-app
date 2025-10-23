@@ -1784,19 +1784,3 @@ body{
   }
 }
 
-/* ============================================= */
-/* ===== FIX DEFINITIVO PARA EL PARPADEO DEL MODAL ===== */
-/* ============================================= */
-
-/* Por defecto, el modal está oculto y no se puede interactuar con él */
-.backdrop {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease-in-out;
-}
-
-/* Cuando JavaScript le añada la clase 'is-visible', se mostrará */
-.backdrop.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-}
