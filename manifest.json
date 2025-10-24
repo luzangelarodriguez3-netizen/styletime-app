@@ -13,6 +13,20 @@
       "sizes": "512x512"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot1.png",
+      "type": "image/png",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/assets/screenshot2.png",
+      "type": "image/png",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    }
+  ],
   "start_url": ".",
   "background_color": "#FFFFFF",
   "display": "standalone",
