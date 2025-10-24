@@ -8,3 +8,23 @@ if ('serviceWorker' in navigator) {
 
 //Registrar el service worker//
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.querySelector('#btnInstalar');
+  btn.style.display = 'block';
+
+  btn.addEventListener('click', async () => {
+    btn.style.display = 'none';
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    console.log('Instalación:', result.outcome);
+    deferredPrompt = null;
+  });
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('✅ Aplicación instalada correctamente');
+});
