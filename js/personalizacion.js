@@ -13,6 +13,7 @@
 // ==========================================================
 // ===== FUNCIÓN DE SEGURIDAD PARA VALIDAR ARCHIVOS =====
 // ==========================================================
+// ===== FUNCIÓN DE SEGURIDAD PARA VALIDAR ARCHIVOS (CORREGIDA) =====
 function validateFile(file) {
   // Regla 1: Definimos los tipos de archivo permitidos (tipos MIME)
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -23,13 +24,15 @@ function validateFile(file) {
 
   // Verificación de Tipo
   if (!allowedTypes.includes(file.type)) {
-    toast(`Tipo de archivo no permitido. Solo se aceptan imágenes.`, 'error');
+    // CORREGIDO: Ahora se llama a showToast()
+    showToast(`Tipo de archivo no permitido. Solo se aceptan imágenes.`, 'error');
     return false; // El archivo es rechazado
   }
 
   // Verificación de Tamaño
   if (file.size > MAX_SIZE_BYTES) {
-    toast(`El archivo es demasiado grande. El máximo es de ${MAX_SIZE_MB} MB.`, 'error');
+    // CORREGIDO: Ahora se llama a showToast()
+    showToast(`El archivo es demasiado grande. El máximo es de ${MAX_SIZE_MB} MB.`, 'error');
     return false; // El archivo es rechazado
   }
 
@@ -40,29 +43,82 @@ function validateFile(file) {
 
     const logoInput   = document.getElementById('logoInput');
     const logoPreview = document.getElementById('logoPreview');
+
+
+    
     const bgInput     = document.getElementById('bgInput');
     const bgThumb     = document.getElementById('bgThumb');
     const bizNameEl   = document.getElementById('bizName');
     const colorPicker = document.getElementById('colorPicker');
     const hexInput    = document.getElementById('hexInput');
 
-    const { data: biz } = await sb.from('businesses').select('*').eq('user_id', u.user.id).order('updated_at',{ascending:false}).limit(1).maybeSingle();
 
-    if (biz) {
-      bizNameEl.value = biz.business_name || '';
-      const brand = biz.brand || '#DD338B';
-      colorPicker.value = brand; hexInput.value = brand;
-      document.documentElement.style.setProperty('--brand', brand);
-      const rgb = hexToRgb(brand);
-      document.documentElement.style.setProperty('--brand-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
-      const pastel = biz.bg_pastel || mixWithWhite(brand,0.88);
-      document.documentElement.style.setProperty('--bg', pastel);
-      if (biz.logo_url)  logoPreview.src = biz.logo_url;
-      if (biz.cover_url) {
-        bgThumb.style.backgroundImage = `url('${biz.cover_url}')`;
-        bgThumb.textContent = '';
-      }
-    }
+    // ===== FIX: CONECTAR CLIC DEL LOGO AL INPUT (UBICACIÓN CORRECTA) =====
+const logoPicker = document.querySelector('.logo-picker');
+if (logoPicker) {
+  logoPicker.addEventListener('click', () => {
+    logoInput.click();
+  });
+}
+
+  // ===== NUEVA LÓGICA DE CREACIÓN/CARGA DE PERFIL =====
+
+// 1. Intentamos obtener los datos del negocio del usuario.
+let { data: biz, error: bizError } = await sb.from('businesses').select('*').eq('user_id', u.user.id).single();
+
+if (bizError && bizError.code === 'PGRST116') {
+  // ERROR 'PGRST116' significa "No se encontró la fila". ¡Perfecto!
+  // Esto nos indica que es la PRIMERA VEZ que el usuario entra aquí.
+  console.log('Perfil de negocio no encontrado, creando uno nuevo...');
+
+  const trialEndDate = new Date();
+  trialEndDate.setDate(trialEndDate.getDate() + 15);
+
+  const { data: newBiz, error: createError } = await sb
+    .from('businesses')
+    .insert({
+      user_id: u.user.id,
+      business_name: 'Mi negocio', // Un nombre por defecto
+      brand: '#DD338B',
+      bg_pastel: '#FBE7F1',
+      subscription_status: 'trial',
+      current_period_ends_at: trialEndDate.toISOString()
+    })
+    .select()
+    .single();
+
+  if (createError) {
+    // Si falla la creación, es un error grave.
+    console.error("Error al crear el perfil de negocio:", createError);
+    showToast('No pudimos crear tu perfil. Contacta a soporte.', 'error', 5000);
+    // Podríamos incluso cerrar su sesión aquí para que no se quede en un estado roto.
+    // await sb.auth.signOut();
+    // location.href = 'login.html';
+  } else {
+    // ¡Éxito! Asignamos el perfil recién creado a nuestra variable 'biz'.
+    biz = newBiz;
+    showToast('¡Tu cuenta ha sido activada!', 'success');
+  }
+}
+
+// 2. A partir de aquí, el resto del código funciona igual, porque la variable 'biz' ya existe,
+//    ya sea porque la cargamos o porque la acabamos de crear.
+
+if (biz) {
+  bizNameEl.value = biz.business_name || '';
+  const brand = biz.brand || '#DD338B';
+  colorPicker.value = brand; hexInput.value = brand;
+  document.documentElement.style.setProperty('--brand', brand);
+  const rgb = hexToRgb(brand);
+  document.documentElement.style.setProperty('--brand-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
+  const pastel = biz.bg_pastel || mixWithWhite(brand,0.88);
+  document.documentElement.style.setProperty('--bg', pastel);
+  if (biz.logo_url)  logoPreview.src = biz.logo_url;
+  if (biz.cover_url) {
+    bgThumb.style.backgroundImage = `url('${biz.cover_url}')`;
+    bgThumb.textContent = '';
+  }
+}
 
     // CÓDIGO CORREGIDO PARA EL LOGO
 logoInput?.addEventListener('change', e => {

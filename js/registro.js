@@ -1,3 +1,9 @@
+
+(async () => {
+    await sb.auth.signOut();
+
+
+
 // ===== NUEVA LÓGICA PARA EL CHECKBOX Y EL BOTÓN =====
     const termsCheckbox = document.getElementById('termsCheck');
     const registerButton = document.getElementById('registerBtn');
@@ -35,81 +41,33 @@
     const form = document.getElementById('signupForm');
     const msg  = document.getElementById('signupMsg');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+ // ===== REEMPLAZA TU addEventListener CON ESTA VERSIÓN SIMPLIFICADA =====
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      const businessName = document.getElementById('full_name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const pass  = document.getElementById('password').value;
-      const pass2 = document.getElementById('confirm').value;
+  const registerButton = document.getElementById('registerBtn');
+  registerButton.disabled = true;
+  registerButton.textContent = 'Procesando...';
 
-      if (!email || !pass) {
-        const m = 'Completa correo y contraseña.';
-        showToast(m, 'error', 3000);
-        msg.textContent = m;
-        return;
-      }
-      if (pass !== pass2) {
-        const m = 'Las contraseñas no coinciden.';
-        showToast(m, 'error', 3000);
-        msg.textContent = m;
-        return;
-      }
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('password').value;
+  // ... (mantén tus validaciones de contraseña, etc. aquí si quieres) ...
 
-      if (pass.length < 8) {
-  const m = 'Para mayor seguridad, tu contraseña debe tener al menos 8 caracteres.';
-  showToast(m, 'error', 3000);
-  msg.textContent = m;
-  return; // Detiene el proceso de registro
-}
+  try {
+    const { error } = await sb.auth.signUp({ email, password: pass });
+    if (error) throw error;
 
-      try {
-        const { error: signUpError } = await sb.auth.signUp({ email, password: pass });
-        if (signUpError) {
-          const m = prettyError(signUpError);
-          showToast(m, 'error', 3600);
-          msg.textContent = m;
-          return;
-        }
+    // ÉXITO: Mostramos el mensaje y dejamos el botón desactivado.
+    msg.textContent = '¡Listo! Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para continuar.';
+    showToast('Correo de confirmación enviado', 'success', 5000);
 
-        const { data: { session } } = await sb.auth.getSession();
-        if (!session) {
-          const m = 'Te enviamos un correo para confirmar tu cuenta. Ábrelo y vuelve a iniciar sesión.';
-          showToast(m, 'info', 4200);
-          msg.textContent = m;
-          return;
-        }
+  } catch (err) {
+    const m = prettyError(err);
+    showToast(m, 'error', 3600);
+    msg.textContent = m;
+    registerButton.disabled = false; // Reactivamos el botón solo si hay un error
+    registerButton.textContent = 'Crear cuenta';
+  }
+});
 
-        // REEMPLAZA EL BLOQUE ANTERIOR CON ESTE:
-
-const { user } = session;
-
-// Calculamos la fecha de fin de la prueba: hoy + 15 días
-const trialEndDate = new Date();
-trialEndDate.setDate(trialEndDate.getDate() + 15);
-
-const { error: upsertErr } = await sb
-  .from('businesses')
-  .upsert({
-    user_id: user.id,
-    business_name: businessName || 'Mi negocio',
-    brand: '#DD338B',
-    bg_pastel: '#FBE7F1',
-    
-    // --- NUEVOS CAMPOS AÑADIDOS ---
-    subscription_status: 'trial',
-    current_period_ends_at: trialEndDate.toISOString()
-    // ----------------------------
-
-  }, { onConflict: 'user_id' });
-
-if (upsertErr) throw upsertErr;
-
-        showToast('¡Cuenta creada! Ahora personaliza tu agenda.', 'success', 1400);
-        setTimeout(() => location.href = 'personalizacion.html', 1000);
-      } catch (err) {
-        const m = prettyError(err);
-        showToast(m, 'error', 3600);
-        msg.textContent = m;
-      }
-    });
+    })();

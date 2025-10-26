@@ -16,76 +16,81 @@
 </head>
 
 <body>
-  <main class="phone phone--edit">
+  <!-- El loader no cambia -->
+  <div id="loader" class="loader-container">
+    <div class="loader-spinner"></div>
+    <p>Cargando...</p>
+  </div>
 
-    <!-- ===== AÑADE ESTE CÓDIGO AQUÍ ===== -->
-    <div id="loader" class="loader-container">
-      <div class="loader-spinner"></div>
-      <p>Cargando...</p>
-    </div>
-
-     
-    
+  <!-- Hemos cambiado la clase de <main> -->
+  <main class="page-container">
+    <!-- Las hojas y decoraciones no cambian -->
     <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--tl">
     <img src="./assets/hojas.svg" alt="" aria-hidden="true" class="leaf leaf--br">
     <div class="bg-deco bg-deco--tl" aria-hidden="true"></div>
     <div class="bg-deco bg-deco--br" aria-hidden="true"></div>
 
-    <section class="screen screen--spacious screen--top">
-      <h1 class="screen-title">Personaliza tu agenda</h1>
-      <p class="subtitle subtitle--muted">Estos cambios los verá tu cliente al reservar.</p>
+    <!-- NUEVO: Envolvemos el contenido en una tarjeta para el estilo de escritorio -->
+    <div class="form-card">
+      <section class="screen">
+        <h1 class="screen-title">Personaliza tu agenda</h1>
+        <p class="subtitle subtitle--muted">Tu logo ,el nombre de tu negocio  y el color que escogiste de acento, los verá tu cliente en el formulario de  reservar.</p>
 
-      <form class="form" action="#" method="post" novalidate>
-        <div class="field">
-          <label class="label">Logo del negocio</label>
-          <div class="customizer-row">
-            <div class="logo-picker">
-              <img id="logoPreview" src="./assets/logo.svg" alt="Logo del negocio" />
-              <input type="file" id="logoInput" accept="image/*" />
+        <form class="form" action="#" method="post" novalidate>
+          <div class="field">
+            <label class="label">Logo del negocio</label>
+            <div class="customizer-row">
+              <div class="logo-picker">
+                <img id="logoPreview" src="./assets/logo.svg" alt="Logo del negocio" />
+                <input type="file" id="logoInput" accept="image/*" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="field">
-          <label class="label">Foto de fondo (opcional)</label>
-          <div class="bg-thumb" id="bgThumb">Sin imagen</div>
-          <input type="file" id="bgInput" accept="image/*" />
-          <small class="hint">Vista previa reducida del fondo.</small>
-        </div>
-
-        <div class="field">
-          <label for="bizName" class="label">Nombre del negocio</label>
-          <input id="bizName" name="biz_name" type="text" class="input" placeholder="Ej. Trenzas de Laura" />
-        </div>
-
-        <div class="field">
-          <label class="label">Elige tu color representativo</label>
-          <div class="customizer-row">
-            <input type="color" id="colorPicker" class="input color-input" value="#DD338B" />
-            <input type="text" id="hexInput" class="input" value="#DD338B" maxlength="9" />
+          <div class="field">
+            <label class="label" for="bgInput">Foto de fondo (opcional)</label>
+            <div class="bg-thumb" id="bgThumb">Sin imagen</div>
+            <!-- NUEVO: Un label estilizado para el botón de subir archivo -->
+            <label for="bgInput" class="btn-file-upload">
+              Seleccionar archivo
+            </label>
+            <input type="file" id="bgInput" accept="image/*" /> <!-- Este se ocultará con CSS -->
+            <small class="hint">Vista previa reducida del fondo.</small>
           </div>
-          <small class="hint">El color actualizará botones y acentos. También generaremos un fondo pastel del mismo tono.</small>
-        </div>
 
-        <div class="actions actions--spaced">
-          <a class="btn btn-outline" href="./agenda.html">Ir a mi agenda</a>
-        </div>
-      </form>
-    </section>
+          <div class="field">
+            <label for="bizName" class="label">Nombre del negocio</label>
+            <input id="bizName" name="biz_name" type="text" class="input" placeholder="Ej. Trenzas de Laura" />
+          </div>
 
-    <footer class="legal legal--raised">
-      <a href="./terminos.html">Términos y Condiciones</a>
-      <span>•</span>
-      <a href="./privacidad.html">Política de Privacidad</a>
-    </footer>
+          <div class="field">
+            <label class="label">Elige tu color representativo</label>
+            <div class="customizer-row">
+              <input type="color" id="colorPicker" class="input color-input" value="#DD338B" />
+              <input type="text" id="hexInput" class="input" value="#DD338B" maxlength="9" />
+            </div>
+            <small class="hint">El color actualizará botones y acentos. También generaremos un fondo pastel del mismo tono.</small>
+          </div>
 
-    <div id="toast" class="toast" hidden role="alert" aria-live="assertive"></div>
+          <div class="actions actions--spaced">
+            <!-- CAMBIADO: De un enlace <a> a un botón <button> con una clase primaria -->
+            <button type="button" class="btn btn-primary">Guardar y continuar</button>
+          </div>
+        </form>
+      </section>
+
+      <footer class="legal">
+        <a href="./terminos.html">Términos y Condiciones</a>
+        <span>•</span>
+        <a href="./privacidad.html">Política de Privacidad</a>
+      </footer>
+    </div>
   </main>
+
+  <div id="toast" class="toast" hidden role="alert" aria-live="assertive"></div>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="./supabaseClient.js"></script>
-  <script src="./js/personalizacion.js"></script> <!-- ¡LA NUEVA LÍNEA! -->
-
- 
+  <script src="./js/personalizacion.js"></script>
 </body>
 </html>

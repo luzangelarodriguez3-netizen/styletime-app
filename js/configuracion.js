@@ -106,7 +106,7 @@ pwSave.addEventListener('click', async () => {
   const p1 = document.getElementById('newPw').value.trim();
   const p2 = document.getElementById('newPw2').value.trim();
 
-  if (p1.length < 6) { toast('La contraseña debe tener al menos 6 caracteres','error'); return; }
+  if (p1.length < 8) { toast('La contraseña debe tener al menos 8 caracteres','error'); return; }
   if (p1 !== p2) { toast('Las contraseñas no coinciden','error'); return; }
 
   try {
@@ -121,65 +121,89 @@ pwSave.addEventListener('click', async () => {
 });
 // ============================================
 
-    // --- Eliminar cuenta (modal) ---
-    // PEGA ESTE NUEVO BLOQUE EN SU LUGAR:
-
 // --- Eliminar cuenta (modal con borrado suave) ---
 const delBackdrop = $('delBackdrop');
+const delConfirmBtn = $('delConfirm'); // Guardamos una referencia al botón
+
 $('delBtn').addEventListener('click', () => delBackdrop.style.display = 'flex');
 $('delCancel').addEventListener('click', () => delBackdrop.style.display = 'none');
 delBackdrop.addEventListener('click', (e) => {
     if (e.target === delBackdrop) delBackdrop.style.display = 'none';
 });
 
-$('delConfirm').addEventListener('click', async () => {
-  try {
-    // 1. Borramos todos los datos del usuario de nuestras tablas.
-    const tables = ['appointments', 'services', 'working_hours', 'day_blocks', 'businesses'];
-    for (const t of tables) {
-      const { error } = await sb.from(t).delete().eq('user_id', userId);
-      if (error) console.warn(`No se pudo borrar en ${t}:`, error.message);
+delConfirmBtn.addEventListener('click', async () => {
+  // Deshabilitar el botón para evitar dobles clics
+  delConfirmBtn.disabled = true;
+  delConfirmBtn.textContent = 'Eliminando...';
+
+  // 1. Llamamos a la función que creamos en Supabase
+  const { error: rpcError } = await sb.rpc('soft_delete_user');
+
+  if (rpcError) {
+    // Si la función de Supabase falla, mostramos un error claro
+    console.error("Error al ejecutar soft_delete_user:", rpcError);
+    toast('No se pudo eliminar la cuenta. Inténtalo de nuevo.', 'error');
+    
+    // Reactivamos el botón
+    delConfirmBtn.disabled = false;
+    delConfirmBtn.textContent = 'Confirmar';
+
+  } else {
+    // 2. Si la función tuvo éxito, ahora SÍ cerramos la sesión
+    toast('Cuenta eliminada. Serás redirigido.', 'ok', 2000);
+    
+    const { error: signOutError } = await sb.auth.signOut();
+    if (signOutError) {
+        console.error("Error al cerrar sesión tras eliminar la cuenta:", signOutError);
     }
-
-    // 2. "Corrompemos" el email en Supabase Auth para liberarlo.
-    const deletedEmail = `${userEmail}#deleted_${Date.now()}`;
-    const { error: updateError } = await sb.auth.updateUser({ email: deletedEmail });
-    if (updateError) throw updateError;
     
-    // 3. Cerramos la sesión y redirigimos a la página de registro.
-    toast('Cuenta eliminada permanentemente. Serás redirigido.', 'ok', 2000);
-    
-    setTimeout(async () => {
-      await sb.auth.signOut();
+    // 3. Finalmente, redirigimos al usuario, pase lo que pase.
+    // Usamos un pequeño delay para que el usuario alcance a leer el toast.
+    setTimeout(() => {
       location.href = 'registro.html';
-    }, 2000);
-
-  } catch (err) {
-    console.error("Error al eliminar la cuenta:", err);
-    toast('No se pudo completar la eliminación de la cuenta.', 'error');
-  } finally {
-    delBackdrop.style.display = 'none';
+    }, 1500);
   }
 });
 
-   // PEGA ESTE NUEVO BLOQUE EN LUGAR DEL ANTERIOR
 
-// --- Centro de ayuda (modal con mailto:) ---
-const helpBackdrop = $('helpBackdrop');
-$('helpBtn').addEventListener('click', () => {
-    $('helpEmail').value = userEmail; // Autocompleta con el correo del usuario
-    $('helpMsg').value = '';
-    helpBackdrop.style.display = 'flex';
-});
+// ==========================================================
+// ===== LÓGICA RESTAURADA PARA EL CENTRO DE AYUDA =====
+// ==========================================================
+const helpBackdrop = document.getElementById('helpBackdrop');
+const helpBtn = document.getElementById('helpBtn');
+const helpCancel = document.getElementById('helpCancel');
+const helpSend = document.getElementById('helpSend');
+const helpEmailInput = document.getElementById('helpEmail');
+const helpMsgInput = document.getElementById('helpMsg');
 
-$('helpCancel').addEventListener('click', () => helpBackdrop.style.display = 'none');
-helpBackdrop.addEventListener('click', (e) => {
-    if (e.target === helpBackdrop) helpBackdrop.style.display = 'none';
-});
+// 1. Abrir el modal
+if (helpBtn) {
+  helpBtn.addEventListener('click', () => {
+    if (helpEmailInput) helpEmailInput.value = userEmail; // Autocompleta con el correo del usuario
+    if (helpMsgInput) helpMsgInput.value = ''; // Limpia el mensaje anterior
+    if (helpBackdrop) helpBackdrop.style.display = 'flex';
+  });
+}
 
-$('helpSend').addEventListener('click', () => {
-    const email = $('helpEmail').value.trim();
-    const msg = $('helpMsg').value.trim();
+// 2. Cerrar el modal (con el botón de cancelar o haciendo clic fuera)
+if (helpCancel) {
+  helpCancel.addEventListener('click', () => {
+    if (helpBackdrop) helpBackdrop.style.display = 'none';
+  });
+}
+if (helpBackdrop) {
+  helpBackdrop.addEventListener('click', (e) => {
+    if (e.target === helpBackdrop) {
+      helpBackdrop.style.display = 'none';
+    }
+  });
+}
+
+// 3. Lógica para el botón de "Enviar"
+if (helpSend) {
+  helpSend.addEventListener('click', () => {
+    const email = helpEmailInput ? helpEmailInput.value.trim() : '';
+    const msg = helpMsgInput ? helpMsgInput.value.trim() : '';
 
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
         toast('Escribe un correo válido', 'error');
@@ -190,9 +214,7 @@ $('helpSend').addEventListener('click', () => {
         return;
     }
 
-    // ===== ¡¡¡ IMPORTANTE: PON TU CORREO DE SOPORTE AQUÍ !!! =====
     const tuCorreoDeSoporte = 'luzantienda@gmail.com'; 
-    // ===============================================================
 
     const subject = encodeURIComponent(`Solicitud de Soporte - ${email}`);
     const body = encodeURIComponent(
@@ -204,15 +226,16 @@ $('helpSend').addEventListener('click', () => {
         `Mensaje:\n${msg}`
     );
 
-    // Creamos y abrimos el enlace mailto:
     window.location.href = `mailto:${tuCorreoDeSoporte}?subject=${subject}&body=${body}`;
 
     toast('Se abrirá tu aplicación de correo para que envíes el mensaje.', 'ok', 3000);
     
-    // Cerramos el modal después de un momento
     setTimeout(() => {
-        helpBackdrop.style.display = 'none';
+        if (helpBackdrop) helpBackdrop.style.display = 'none';
     }, 800);
-});
+  });
+}
+// ==========================================================
+
      document.getElementById('loader').classList.add('hidden');
   })();

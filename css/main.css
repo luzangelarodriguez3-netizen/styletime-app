@@ -1784,3 +1784,116 @@ body{
   }
 }
 
+
+
+/* ================================================================= */
+/* ===== MEJORAS VISUALES (VERSIÓN MOBILE-FIRST) - PERSONALIZACIÓN ===== */
+/* ================================================================= */
+
+/* --- ESTILOS BASE (ASÍ SE VERÁ EN MÓVIL) --- */
+
+/* 1. El contenedor principal ocupa toda la pantalla */
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: var(--bg); /* Usa el color de fondo de tu app */
+}
+
+/* 2. La "tarjeta" en móvil es INVISIBLE. Es solo un contenedor con padding. */
+.form-card {
+  width: 100%;
+  background: transparent; /* SIN fondo blanco en móvil */
+  box-shadow: none;        /* SIN sombra en móvil */
+  padding: 2.5rem 1.5rem;  /* Espacio interno para que nada toque los bordes */
+}
+
+/* 3. Ajustes de tipografía (centrados) */
+.form-card .screen-title {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 0.5rem;
+}
+.form-card .subtitle {
+  text-align: center;
+  max-width: 35ch; /* Evita que el texto sea demasiado ancho en pantallas medias */
+  margin: 0 auto 2.5rem auto;
+}
+.form-card .form {
+  gap: 24px;
+}
+
+/* 4. Botón estilizado para "Seleccionar archivo" */
+.form-card input[type="file"] {
+  display: none; /* Ocultamos el input feo */
+}
+.form-card .btn-file-upload {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+}
+.form-card .btn-file-upload:hover {
+  background-color: white;
+}
+
+/* 5. Botón de acción principal */
+.form-card .btn.btn-primary {
+  width: 100%;
+  background: var(--brand);
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px;
+  box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.25);
+  border: none;
+}
+.form-card .btn.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(var(--brand-rgb), 0.3);
+}
+
+/* 6. Footer */
+.form-card .legal {
+  position: static;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+
+/* --- A PARTIR DE 768px (TABLETS/ESCRITORIO), LA MAGIA OCURRE --- */
+
+@media (min-width: 768px) {
+  /* Hacemos que el contenedor principal centre su contenido */
+  .page-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem; /* Espacio exterior para la tarjeta */
+  }
+
+  /* La tarjeta ahora se hace VISIBLE */
+  .form-card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--surface); /* Ahora SÍ tiene fondo blanco */
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    padding: 2.5rem; /* Reajustamos el padding para escritorio */
+    min-height: auto;
+  }
+  
+  /* El footer en escritorio necesita menos espacio inferior */
+  .form-card .legal {
+    padding-bottom: 0;
+  }
+}
+

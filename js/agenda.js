@@ -503,6 +503,20 @@ function manageSubscriptionUI(status) {
   if (paymentModal) paymentModal.style.display = 'none';
   if (renewalBanner) renewalBanner.style.display = 'none';
 
+
+  // ===== AÑADE ESTE BLOQUE PARA DESBLOQUEAR LOS BOTONES =====
+const fabButton = document.querySelector('.fab');
+if (fabButton) {
+  fabButton.onclick = null; // Restaura el comportamiento normal del enlace
+}
+const copyBtn = document.getElementById('copyBtn');
+if (copyBtn) {
+  copyBtn.disabled = false;
+  copyBtn.style.cursor = 'pointer';
+  copyBtn.style.opacity = '1';
+}
+// ========================================================
+
   // 2. Ahora, actuamos según el estado
   switch (status) {
     case 'RENEWAL_WARNING':
