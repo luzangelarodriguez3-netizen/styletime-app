@@ -30,7 +30,7 @@
   "start_url": ".",
   "background_color": "#FFFFFF",
   "display": "standalone",
-  "theme_color": "#DD338B",
+  "theme_color": "#0d034d",
   "orientation": "portrait",
   "categories": [
     "productivity",
