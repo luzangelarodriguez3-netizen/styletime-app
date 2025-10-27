@@ -1,4 +1,9 @@
 (async () => {
+
+
+  
+
+
     // ===== Sesión =====
     const { data: u } = await sb.auth.getUser();
     if (!u?.user) { location.href = 'login.html'; return; }
@@ -22,6 +27,36 @@
       clearTimeout(window._toastTimer);
       window._toastTimer=setTimeout(()=>{ t.classList.remove('is-visible'); t.hidden=true; }, ms);
     }
+
+// ===== NUEVA FUNCIÓN DE LOADER INTELIGENTE =====
+    function manageLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader) return { show: () => {}, hide: () => {} };
+
+      // Creamos un temporizador. El loader solo aparecerá si la carga
+      // tarda más de 300ms, evitando parpadeos en conexiones rápidas.
+      let timer;
+      
+      const show = () => {
+        timer = setTimeout(() => {
+          loader.classList.add('is-visible');
+        }, 300); // 300ms de retraso
+      };
+
+      const hide = () => {
+        clearTimeout(timer); // Anulamos el temporizador si la carga fue rápida
+        loader.classList.remove('is-visible');
+      };
+
+      return { show, hide };
+    }
+
+
+
+
+
+
+
     const fmtMoney = n => Number(n||0).toLocaleString('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0});
     const addMinutes = (hhmm, mins) => {
       const [h,m] = (hhmm||'00:00').split(':').map(Number);
@@ -78,7 +113,7 @@
     menuPanel.addEventListener('click', async (e)=>{ if(e.target?.dataset?.action === 'logout'){ try{ await sb.auth.signOut(); location.href='login.html'; } catch(err){ console.error(err); }}});
 
 
-    document.getElementById('loader').classList.add('hidden');
+    
 
     // ===== Calendario (todas las fechas blancas; solo .is-selected usa brand) =====
     const monthName = document.getElementById('monthName');
@@ -209,4 +244,6 @@ if (todayEl){
 // 3. Ahora, pide los datos "pesados" (citas realizadas del día)
 //    y deja que se carguen en segundo plano sin bloquear la página.
 loadDoneAppointments(todayStr);
+
+
   })();

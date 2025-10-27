@@ -1,4 +1,8 @@
 (async () => {
+
+  
+
+
   // ===== Sesión =====
   const { data: u } = await sb.auth.getUser();
   if (!u?.user) { location.href = 'login.html'; return; }
@@ -14,6 +18,11 @@
   function hexToRgb(hex){ const n=hex.replace('#',''); const big=parseInt(n.length===3?n.split('').map(c=>c+c).join(''):n.slice(0,6),16); return{r:(big>>16)&255,g:(big>>8)&255,b:big&255};}
   function showToast(msg, type='info', ms=2200){ const t=document.getElementById('toast'); if(!t)return; t.textContent=msg; t.className=`toast toast--${type} is-visible`; t.hidden=false; clearTimeout(window._toastTimer); window._toastTimer=setTimeout(()=>{t.classList.remove('is-visible');t.hidden=true;},ms);}
 
+
+
+
+
+
   // Menú
   const menuBtn = document.getElementById('menuBtn');
   const menuPanel = document.getElementById('menuPanel');
@@ -23,7 +32,7 @@
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
   menuPanel.addEventListener('click', async (e)=>{ if(e.target?.dataset?.action === 'logout'){ try{ await sb.auth.signOut(); location.href='login.html'; } catch(err){ console.error(err); }}});
 
-  document.getElementById('loader').classList.add('hidden');
+    
 
 // PEGA ESTE NUEVO BLOQUE EN SU LUGAR:
 
@@ -132,27 +141,44 @@ copyBtn.onclick = async () => {
     return end.getTime() <= now.getTime();
   }
 
-  // ===== Cargar citas de un día =====
   async function loadAppointmentsOfDay(dayISO) {
-    apptList.innerHTML = '<div class="card empty">Cargando citas...</div>';
+  // --- PASO 1: MOSTRAR EL ESQUELETO INMEDIATAMENTE ---
+  apptList.innerHTML = ''; // Limpiamos la lista anterior
+  for (let i = 0; i < 3; i++) { // Creamos 3 tarjetas de esqueleto
+    const skeletonCard = document.createElement('div');
+    skeletonCard.className = 'card appt is-skeleton';
+    skeletonCard.innerHTML = `
+      <div>
+        <div class="appt__name skeleton"></div>
+        <div class="appt__meta">
+          <span class="skeleton"></span>
+        </div>
+      </div>
+      <div class="appt__time skeleton"></div>
+    `;
+    apptList.appendChild(skeletonCard);
+  }
 
-    const { data, error } = await sb
-      .from('appointments')
-      .select('id, customer_name, service_name, price, time, duration_minutes, notes, whatsapp, status')
-      .eq('user_id', userId)
-      .eq('date', dayISO)
-      .order('time', { ascending: true });
+  // --- PASO 2: PEDIR LOS DATOS REALES A SUPABASE ---
+  const { data, error } = await sb
+    .from('appointments')
+    .select('id, customer_name, service_name, price, time, duration_minutes, notes, whatsapp, status')
+    .eq('user_id', userId)
+    .eq('date', dayISO)
+    .order('time', { ascending: true });
 
-    apptList.innerHTML = '';
-    if (error) {
-      console.error("Error cargando citas del día:", error);
-      apptList.innerHTML = '<div class="card empty">Error al cargar las citas.</div>';
-      return;
-    }
-    if (!data || !data.length) {
-      apptList.innerHTML = '<div class="card empty">No hay citas reservadas para este día.</div>';
-      return;
-    }
+  // --- PASO 3: REEMPLAZAR EL ESQUELETO CON LOS DATOS REALES ---
+  apptList.innerHTML = ''; // Limpiamos el esqueleto
+
+  if (error) {
+    console.error("Error cargando citas del día:", error);
+    apptList.innerHTML = '<div class="card empty">Error al cargar las citas.</div>';
+    return;
+  }
+  if (!data || !data.length) {
+    apptList.innerHTML = '<div class="card empty">No hay citas reservadas para este día.</div>';
+    return;
+  }
 
     // REEMPLAZA TU BUCLE 'for' ACTUAL CON ESTA VERSIÓN CORREGIDA
 
@@ -174,7 +200,7 @@ for (const a of data) {
     let reminderButtonHtml = '';
     // ===== AQUÍ ESTÁ LA CORRECCIÓN CLAVE =====
     // Ahora solo se activa si la cita NO está cancelada Y está próxima.
-    if (a.status !== 'cancelled' && minutesDifference <= 90 && minutesDifference > 0) {
+    if (a.status !== 'cancelled' && minutesDifference <= 180 && minutesDifference > 0) {
         card.classList.add('is-due');
         if (a.whatsapp) {
             reminderButtonHtml = `
@@ -198,6 +224,8 @@ for (const a of data) {
     if (a.status === 'cancelled') {
         card.classList.add('appt--cancelled');
     }
+
+
 
     card.innerHTML = `
       <div>
@@ -270,75 +298,76 @@ for (const a of data) {
     };
     setActive(appt.status || 'confirmed');
 
-    // Cambiar estado en Supabase
-    // CÓDIGO NUEVO (PEGA TODO ESTE BLOQUE EN LUGAR DEL ANTERIOR):
-dialog.querySelectorAll('.btn-status').forEach(btn=>{
-  btn.addEventListener('click', async ()=>{
-    const newStatus = btn.dataset.status;
+    // ===== REEMPLAZA CON ESTE BLOQUE MEJORADO =====
+dialog.querySelectorAll('.btn-status').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    
+    // Obtenemos el estado actual REAL de la cita
+    const currentStatus = appt.status || 'confirmed';
+    // Obtenemos el estado al que se quiere cambiar
+    const targetStatus = btn.dataset.status;
 
-    // --- INICIO DE LA NUEVA LÓGICA DE CANCELACIÓN (Regla de 2 horas) ---
-    if (newStatus === 'cancelled') {
-      const MIN_HOURS_BEFORE_CANCELLATION = 2; // Tu regla de 2 horas
-
+    // --- ¡NUEVA LÓGICA DE REVERSIÓN! ---
+    // Si el usuario hace clic en el botón del estado que ya está activo,
+    // revertimos la cita al estado 'confirmed'.
+    // Si no, procedemos a cambiar al nuevo estado (targetStatus).
+    const newStatus = (currentStatus === targetStatus) ? 'confirmed' : targetStatus;
+    
+    // --- LÓGICA DE CANCELACIÓN (Regla de 2 horas) ---
+    // Esta lógica solo se ejecuta si estamos INTENTANDO cancelar, no al revertir.
+    if (newStatus === 'cancelled' && currentStatus !== 'cancelled') {
+      const MIN_HOURS_BEFORE_CANCELLATION = 2;
       const appointmentDateTime = new Date(`${appt.date}T${appt.time}`);
       const now = new Date();
       const hoursDifference = (appointmentDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-      // Si la cita ya pasó o es en menos de 2 horas, mostramos una advertencia.
-      if (hoursDifference < MIN_HOURS_BEFORE_CANCELLATION) {
-        // La cita ya pasó, no tiene sentido advertir, solo cancelar.
-        if (hoursDifference < 0) {
-            // No hacemos nada especial, simplemente dejamos que se cancele.
-        } else {
-            // La cita es pronto, advertimos al dueño.
-            const confirmLateCancellation = confirm(
-              "ADVERTENCIA: Faltan menos de 2 horas para esta cita.\n\n" +
-              "Si continúas, la cita se marcará como cancelada y el horario se liberará para otros clientes.\n\n" +
-              "¿Estás seguro de que quieres cancelarla?"
-            );
-            // Si el dueño presiona "Cancelar" en el aviso, detenemos todo.
-            if (!confirmLateCancellation) {
-              return; 
-            }
+      if (hoursDifference < MIN_HOURS_BEFORE_CANCELLATION && hoursDifference >= 0) {
+        const confirmLateCancellation = confirm(
+          "ADVERTENCIA: Faltan menos de 2 horas para esta cita.\n\n" +
+          "Si continúas, la cita se marcará como cancelada y el horario se liberará.\n\n" +
+          "¿Estás seguro de que quieres cancelarla?"
+        );
+        if (!confirmLateCancellation) {
+          return; 
         }
       }
     }
-    // --- FIN DE LA NUEVA LÓGICA ---
+    // --- FIN LÓGICA CANCELACIÓN ---
 
-    // El resto del código es el que ya tenías para actualizar el estado
-    if (newStatus === (appt.status || 'confirmed')) {
-      setActive(newStatus);
-      return;
-    }
-    setActive(newStatus); // optimista
+    // Actualizamos visualmente el botón activo de forma optimista
+    setActive(newStatus);
+
     try {
-  const { error } = await sb
-    .from('appointments')
-    .update({ status: newStatus })
-    .eq('id', appt.id)
-    .eq('user_id', userId);
-  if (error) throw error;
-  
-  appt.status = newStatus;
-  if (cardEl) {
-    cardEl.dataset.status = newStatus;
-    // ===== AÑADE ESTA LÓGICA DE CLASES =====
-    if (newStatus === 'cancelled') {
-      cardEl.classList.add('appt--cancelled');
-    } else {
-      cardEl.classList.remove('appt--cancelled');
-    }
-    // ========================================
-  }
-  showToast('Estado actualizado', 'success', 1200);
-    }catch(err){
-      console.error(err);
-      setActive(appt.status || 'confirmed'); // revertir si falla
+      // Enviamos la actualización a Supabase
+      const { error } = await sb
+        .from('appointments')
+        .update({ status: newStatus })
+        .eq('id', appt.id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      
+      // Actualizamos el estado en memoria y en la tarjeta de la agenda
+      appt.status = newStatus;
+      if (cardEl) {
+        cardEl.dataset.status = newStatus;
+        cardEl.classList.toggle('appt--cancelled', newStatus === 'cancelled');
+
+
+        
+
+        // Podrías añadir una clase 'appt--done' si quieres un estilo visual para las realizadas
+      }
+      showToast('Estado actualizado', 'success', 1200);
+
+    } catch(err) {
+      console.error("Error al actualizar estado:", err);
+      // Si la actualización falla, revertimos el cambio visual al estado original
+      setActive(currentStatus); 
       showToast('No se pudo actualizar', 'error', 1800);
     }
   });
 });
-
     // Cerrar
     dialog.querySelector('.appt-close').addEventListener('click', ()=> document.body.removeChild(backdrop));
     backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) document.body.removeChild(backdrop); });
@@ -458,7 +487,7 @@ if (todayElement) {
 
 // 3. Ahora, pide los datos "pesados" (citas del mes y del día)
 //    y deja que se carguen en segundo plano sin bloquear la página.
-Promise.all([
+await Promise.all([
     markMonthAppointments(current.getFullYear(), current.getMonth()),
     loadAppointmentsOfDay(todayStr)
 ]);
@@ -567,5 +596,7 @@ if (paymentModalCloseBtn) {
 // ===============================================================
 // ===== FIN DE LA LÓGICA DE ACCIÓN =====
 // ===============================================================
+
+
 
 })();

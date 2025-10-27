@@ -1,4 +1,7 @@
 (async () => {
+
+
+
     // ===============================================
     // ===== 1. CONFIGURACIÓN Y FUNCIONES DE AYUDA =====
     // ===============================================
@@ -23,6 +26,36 @@
 // ===== 2. INICIALIZACIÓN Y CARGA DE DATOS (CORREGIDO) =====
 // ===============================================
 function hexToRgb(hex){ const n=hex.replace('#',''); const big=parseInt(n.length===3?n.split('').map(c=>c+c).join(''):n.slice(0,6),16); return{r:(big>>16)&255,g:(big>>8)&255,b:big&255};}
+
+
+// ===== NUEVA FUNCIÓN DE LOADER INTELIGENTE =====
+    function manageLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader) return { show: () => {}, hide: () => {} };
+
+      // Creamos un temporizador. El loader solo aparecerá si la carga
+      // tarda más de 300ms, evitando parpadeos en conexiones rápidas.
+      let timer;
+      
+      const show = () => {
+        timer = setTimeout(() => {
+          loader.classList.add('is-visible');
+        }, 300); // 300ms de retraso
+      };
+
+      const hide = () => {
+        clearTimeout(timer); // Anulamos el temporizador si la carga fue rápida
+        loader.classList.remove('is-visible');
+      };
+
+      return { show, hide };
+    }
+
+
+
+
+
+
 
 // 🔹 CORRECCIÓN CLAVE: Obtener el ID del negocio únicamente desde el parámetro 'b' en la URL.
 const url = new URL(location.href);
@@ -292,5 +325,5 @@ confirmBackdrop.addEventListener('click', (e) => {
     closeModal();
   }
 });
-document.getElementById('loader').classList.add('hidden');
+
   })();

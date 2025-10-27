@@ -1,4 +1,7 @@
 (async () => {
+
+  
+
     const { data: u } = await sb.auth.getUser();
     if (!u?.user) { location.href = 'login.html'; return; }
 
@@ -6,6 +9,32 @@
     function toHex(n){return n.toString(16).padStart(2,'0');}
     function mixWithWhite(hex,t=0.88){const{r,g,b}=hexToRgb(hex);const rr=Math.round(r+(255-r)*t),gg=Math.round(g+(255-g)*t),bb=Math.round(b+(255-b)*t);return`#${toHex(rr)}${toHex(gg)}${toHex(bb)}`;}
     function showToast(msg, type='info', ms=2600){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className=`toast toast--${type} is-visible`;t.hidden=false;clearTimeout(window._toastTimer);window._toastTimer=setTimeout(()=>{t.classList.remove('is-visible');t.hidden=true;},ms);}
+
+
+// ===== NUEVA FUNCIÓN DE LOADER INTELIGENTE =====
+    function manageLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader) return { show: () => {}, hide: () => {} };
+
+      // Creamos un temporizador. El loader solo aparecerá si la carga
+      // tarda más de 300ms, evitando parpadeos en conexiones rápidas.
+      let timer;
+      
+      const show = () => {
+        timer = setTimeout(() => {
+          loader.classList.add('is-visible');
+        }, 300); // 300ms de retraso
+      };
+
+      const hide = () => {
+        clearTimeout(timer); // Anulamos el temporizador si la carga fue rápida
+        loader.classList.remove('is-visible');
+      };
+
+      return { show, hide };
+    }
+
+
 
 
     // PEGA ESTA NUEVA FUNCIÓN AL PRINCIPIO DE TU SCRIPT
@@ -225,5 +254,5 @@ bgInput?.addEventListener('change', e => {
       }
     });
 
-    document.getElementById('loader').classList.add('hidden');
+   
   })();

@@ -1,4 +1,10 @@
 (async () => {
+
+
+  const loader = manageLoader(); // <<--- AÑADE ESTA LÍNEA
+    loader.show();                 // <<--- AÑADE ESTA LÍNEA
+
+
     /* ===== Funciones de Ayuda (Helpers) ===== */
     function showToast(msg, type='info', ms=2200){
       const t = document.getElementById('toast');
@@ -14,6 +20,33 @@
       const big = parseInt(n.length===3 ? n.split('').map(c=>c+c).join('') : n.slice(0,6), 16);
       return { r:(big>>16)&255, g:(big>>8)&255, b:big&255 };
     }
+
+// ===== NUEVA FUNCIÓN DE LOADER INTELIGENTE =====
+    function manageLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader) return { show: () => {}, hide: () => {} };
+
+      // Creamos un temporizador. El loader solo aparecerá si la carga
+      // tarda más de 300ms, evitando parpadeos en conexiones rápidas.
+      let timer;
+      
+      const show = () => {
+        timer = setTimeout(() => {
+          loader.classList.add('is-visible');
+        }, 300); // 300ms de retraso
+      };
+
+      const hide = () => {
+        clearTimeout(timer); // Anulamos el temporizador si la carga fue rápida
+        loader.classList.remove('is-visible');
+      };
+
+      return { show, hide };
+    }
+
+
+
+
     const groupThousands = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
     /* ===== Sesión y Autenticación ===== */
@@ -213,4 +246,6 @@
     // Carga inicial de los servicios
     await loadServices();
     document.getElementById('loader').classList.add('hidden');
+
+    loader.hide();
   })();

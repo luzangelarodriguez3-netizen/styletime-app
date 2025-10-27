@@ -1,7 +1,42 @@
  (async () => {
+
+              
+
+
     const $ = (id)=>document.getElementById(id);
     function hexToRgb(hex){const n=hex.replace('#','');const big=parseInt(n.length===3?n.split('').map(c=>c+c).join(''):n.slice(0,6),16);return{r:(big>>16)&255,g:(big>>8)&255,b:big&255};}
     function toast(msg,type='info',ms=2200){const t=$('toast');if(!t)return;t.textContent=msg;t.className=`toast toast--${type} is-visible`;t.hidden=false;clearTimeout(window._to);window._to=setTimeout(()=>{t.classList.remove('is-visible');t.hidden=true;},ms);}
+    
+    
+    // ===== NUEVA FUNCIÓN DE LOADER INTELIGENTE =====
+    function manageLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader) return { show: () => {}, hide: () => {} };
+
+      // Creamos un temporizador. El loader solo aparecerá si la carga
+      // tarda más de 300ms, evitando parpadeos en conexiones rápidas.
+      let timer;
+      
+      const show = () => {
+        timer = setTimeout(() => {
+          loader.classList.add('is-visible');
+        }, 300); // 300ms de retraso
+      };
+
+      const hide = () => {
+        clearTimeout(timer); // Anulamos el temporizador si la carga fue rápida
+        loader.classList.remove('is-visible');
+      };
+
+      return { show, hide };
+    }
+    
+    
+    
+    
+    
+    
+    
     // sesión
     const { data: u } = await sb.auth.getUser();
     if(!u?.user){ location.href='login.html'; return; }
@@ -237,5 +272,5 @@ if (helpSend) {
 }
 // ==========================================================
 
-     document.getElementById('loader').classList.add('hidden');
+     
   })();

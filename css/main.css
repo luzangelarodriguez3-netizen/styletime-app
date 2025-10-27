@@ -1093,14 +1093,17 @@ body{
   left: 0;
   width: 100%;
   height: 100%;
-  display: flex;
+  
   flex-direction: column;
   justify-content: center;
+  display: none;
   align-items: center;
   background-color: var(--bg, #fff); /* Usa el color de fondo que ya tienes */
   z-index: 999; /* Asegura que esté por encima de todo */
   transition: opacity 0.3s ease;
 }
+
+
 
 .loader-spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
@@ -1896,4 +1899,55 @@ body{
     padding-bottom: 0;
   }
 }
+
+
+/* main.css */
+
+/* ===== ESTILOS PARA EL ESQUELETO DE CARGA (SKELETON) ===== */
+.appt.is-skeleton {
+  pointer-events: none; /* No se puede hacer clic en las tarjetas falsas */
+}
+
+.is-skeleton .skeleton {
+  background-color: #e2e8f0;
+  border-radius: 6px;
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Ajustamos el tamaño de los elementos falsos */
+.is-skeleton .appt__name {
+  height: 20px;
+  width: 60%;
+  margin-bottom: 8px;
+}
+.is-skeleton .appt__meta span:first-child {
+  height: 16px;
+  width: 80%;
+}
+.is-skeleton .appt__price {
+  display: none; /* Ocultamos el precio falso para simplificar */
+}
+.is-skeleton .appt__time {
+  height: 36px;
+  width: 90px;
+  background-color: #e2e8f0;
+}
+
+/* Estilo para tarjetas de citas canceladas (YA LO TIENES) */
+.appt--cancelled {
+  background-color: #fee2e2; /* Fondo rojo pastel */
+  border-color: #fca5a5;
+}
+.appt--cancelled .appt__name {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+
+
 
