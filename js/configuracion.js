@@ -71,7 +71,7 @@ const status = biz.subscription_status;
 const endDate = new Date(biz.current_period_ends_at);
 const now = new Date();
 const formattedEndDate = endDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-const wompiLink = "https://checkout.wompi.co/l/test_Gx9681"; // <-- ¡RECUERDA PONER TU LINK AQUÍ!
+const wompiLink = "https://checkout.wompi.co/l/ZtpXFr"; // <-- ¡RECUERDA PONER TU LINK AQUÍ!
 
 subscriptionAction.href = wompiLink;
 

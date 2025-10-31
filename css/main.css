@@ -544,18 +544,7 @@ body{
 .appointments__title{ font-size: 14px; color:#444; margin: 8px 0 12px; }
 .appointments__list{ display: grid; gap: 10px; }
 
-/* Tarjeta de cita con look mockup */
-.card.appt{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  gap:10px;
-  align-items:flex-start;
-  background:#fff;
-  border:1px solid rgba(var(--brand-rgb)/.35);
-  border-radius:16px;
-  padding:12px 14px;
-  box-shadow:0 8px 22px rgba(0,0,0,.10);
-}
+
 
 /* Nombre en negrita */
 .appt__name{
@@ -951,70 +940,9 @@ body{
 
 /* === Tarjetas de cita con fondo sólido del color de la marca === */
 
-.card.appt {
-  background: var(--brand); /* mismo color del botón "cita" */
-  border: none;
-  box-shadow: 0 8px 20px rgba(var(--brand-rgb) / .35);
-  border-radius: 16px;
-  color: #fff; /* texto blanco para contraste */
-}
 
-/* Nombre del cliente */
-.card.appt .appt__name {
-  color: #fff;
-  font-weight: 700;
-}
 
-/* Servicio + precio */
-.card.appt .appt__meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
-  color: #fff;
-}
 
-/* Precio en "pastilla" blanca */
-.card.appt .appt__price {
-  background: #fff;
-  color: var(--brand);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-  border: none;
-}
-
-/* Hora en recuadro blanco a la derecha */
-.card.appt .appt__time {
-  background: #fff;
-  color: var(--brand);
-  font-weight: 700;
-  border-radius: 12px;
-  padding: 8px 12px;
-  min-width: 100px;
-  text-align: center;
-  border: none;
-  box-shadow: 0 3px 8px rgba(0,0,0,.08);
-}
-
-/* Nota o comentario */
-.card.appt .appt__note {
-  grid-column: 1 / -1;
-  background: rgba(255,255,255,.12);
-  border-radius: 10px;
-  padding: 6px 8px;
-  margin-top: 8px;
-  color: #f8f8f8;
-  font-size: 12.5px;
-}
-
-/* Efecto hover suave */
-.card.appt:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(var(--brand-rgb) / .45);
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
 
 /* ---- Panel flotante para ver/gestionar una cita ---- */
 .appt-backdrop{
@@ -1135,19 +1063,7 @@ body{
       pointer-events: auto; /* override de estilos anteriores */
     }
 
-    /* 2) Tarjeta vencida (ya pasó la hora fin) con texto legible */
-    .appt.appt--expired{
-      background:#e5e7eb !important;   /* gris claro */
-      color:#111 !important;            /* texto negro */
-      opacity: .98;
-    }
-    .appt.appt--expired *{
-      color:#111 !important;
-    }
-    .appt.appt--expired .appt__time{
-      background:#fff !important;
-      border: 1px solid #cbd5e1 !important;
-    }
+    
 
     /* 3) Botones de estado en el modal */
     .btn-status{
@@ -1212,20 +1128,10 @@ body{
 
     /* Pega este nuevo estilo al final de la sección <style> */
 
-/* 4) Estilo para tarjetas canceladas */
-.appt.appt--cancelled {
-  background: #fee2e2 !important; /* Un rojo muy pálido */
-  color: #7f1d1d !important;      /* Texto rojo oscuro */
-  opacity: .95;
-}
-.appt.appt--cancelled * {
-  color: #7f1d1d !important;
-}
-.appt.appt--cancelled .appt__time {
-  background: #fff !important;
-  border: 1px solid #fecaca !important;
-}
-/* Pega este nuevo estilo al final de la sección <style> */
+
+
+
+
 
 /* 5) Estilo para el contenedor de acciones en la tarjeta */
 .appt__actions {
@@ -1282,21 +1188,7 @@ body{
 }
 
 
-/* estilos de canceladas.html*/
 
-/* Estilo para tarjetas canceladas */
-  .appt.appt--cancelled {
-    background: #fee2e2 !important; /* Un rojo muy pálido */
-    color: #7f1d1d !important;      /* Texto rojo oscuro */
-    opacity: .95;
-  }
-  .appt.appt--cancelled * {
-    color: #7f1d1d !important;
-  }
-  .appt.appt--cancelled .appt__time {
-    background: #fff !important;
-    border: 1px solid #fecaca !important;
-  }
 
   /* estilos configuracion.html*/
 
@@ -1938,15 +1830,338 @@ body{
   background-color: #e2e8f0;
 }
 
-/* Estilo para tarjetas de citas canceladas (YA LO TIENES) */
-.appt--cancelled {
-  background-color: #fee2e2; /* Fondo rojo pastel */
-  border-color: #fca5a5;
+/* ========================================================= */
+/* ===== ESTILOS UNIFICADOS PARA TARJETAS DE CITA (appt) ===== */
+/* ========================================================= */
+
+/* --- 1. Estilo BASE para TODAS las tarjetas --- */
+.card.appt {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: flex-start;
+  
+  /* ===== ¡AQUÍ ESTÁ LA SOLUCIÓN DEFINITIVA! ===== */
+  /* Usamos la variable --bg que guarda el color pastel del tema del usuario */
+  background-color: color-mix(in oklab, var(--bg) 78%, transparent);
+
+  border: 1px solid rgba(var(--brand-rgb, 221 51 139), 0.35);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.10);
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
-.appt--cancelled .appt__name {
+.appt__price {
+  background-color: var(--brand, #DD338B); /* Color sólido de la marca */
+  color: #fff;                             /* Texto blanco para contraste */
+  padding: 4px 12px;                      /* Espaciado interno */
+  border-radius: 12px;                    /* Bordes redondeados */
+  font-weight: 600;                       /* Texto en negrita */
+  font-size: 0.9em;                       /* Tamaño de letra ligeramente más pequeño */
+  display: inline-block;                  /* Para que el padding funcione correctamente */
+}
+
+
+
+/* --- 2. Estilo para citas EXPIRADAS (gris) --- */
+.card.appt.appt--expired {
+  background: #f3f4f6;   /* gris muy claro */
+  border-color: #e5e7eb;
+}
+.card.appt.appt--expired .appt__name { color: #6b7280; }
+
+/* --- 3. Estilo para citas CANCELADAS (rojo) --- */
+.card.appt.appt--cancelled {
+  background: #f1a8a8;
+  border-color: #f0a5a5;
+}
+
+.card.appt.appt--cancelled .appt__name {
+  color: #a82e2e;
   text-decoration: line-through;
-  color: #9ca3af;
+  text-decoration-thickness: 2px;
 }
+.card.appt.appt--cancelled .appt__meta,
+.card.appt.appt--cancelled .appt__time {
+  opacity: 0.7;
+}
+
+/* --- 4. Estilo para citas REALIZADAS (verde) --- */
+.card.appt.appt--done {
+  background: #a9ecc1;
+  border-color: #86efac;
+}
+.card.appt.appt--done .appt__name {
+  color: #166534;
+ 
+}
+.card.appt.appt--done .appt__meta,
+.card.appt.appt--done .appt__time {
+  opacity: 0.8;
+}
+
+/* ======================================================= */
+/* ESTILOS PÁGINA DE GANANCIAS (VERSIÓN CON TEMA DINÁMICO) */
+/* ======================================================= */
+.page-content {
+  position: relative;
+  z-index: 10;
+  background-color: transparent;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page-title {
+  font-size: 1.6em;
+  font-weight: 700;
+  text-align: center;
+  color: var(--brand, #DD338B);
+  margin-bottom: 0;
+  padding-top: 10px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.date-range-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 120px;
+}
+
+.form-group label {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fff;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: var(--brand, #DD338B);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-grow: 2;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* --- Estilos para los resultados --- */
+.report-result .card {
+  margin-bottom: 16px;
+}
+
+/* ===== AQUÍ ESTÁ EL CAMBIO PRINCIPAL ===== */
+.total-summary {
+  text-align: center;
+  /* ANTES: background-color: #e0f2fe; (azul claro fijo) */
+  /* AHORA: Usa el color de la marca con 10% de opacidad para un fondo suave */
+  background-color: rgba(var(--brand-rgb, 221 51 139), 0.1);
+  /* ANTES: border-left: 5px solid #38bdf8; (azul fijo) */
+  /* AHORA: Usa el color de la marca sólido */
+  border-left: 5px solid var(--brand, #DD338B);
+}
+
+.grand-total {
+  font-size: 2.2em;
+  font-weight: 700;
+  /* ANTES: color: #0c4a6e; (azul oscuro fijo) */
+  /* AHORA: Usa el color de la marca para el texto principal */
+  color: var(--brand, #DD338B);
+  margin: 8px 0;
+}
+
+.breakdown-title {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+  padding-left: 4px;
+}
+
+.day-card .day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #ddd;
+  margin-bottom: 10px;
+}
+
+.day-date {
+  color: var(--brand, #DD338B);
+}
+
+.day-total {
+  color: #166534; /* Mantenemos el verde para las ganancias, crea buen contraste */
+}
+
+.day-appointments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.day-appointments-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  padding: 4px 0;
+}
+
+.day-appointments-list li span:first-child {
+  color: #555;
+  padding-right: 10px;
+}
+.day-appointments-list li span:last-child {
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.report-result .empty.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 5px solid #b91c1c;
+}
+
+
+
+/* ======================================================= */
+/* ===== ESTILOS RESPONSIVOS PARA PC Y TABLETS ===== */
+/* ======================================================= */
+
+/* Aplica estos estilos solo en pantallas de 600px o más de ancho */
+@media (min-width: 600px) {
+
+  /* 1. Centramos y limitamos el ancho del selector de fecha */
+  .date-range-picker {
+    max-width: 550px;     /* Evita que se estire demasiado */
+    margin-left: auto;    /* Centra el contenedor horizontalmente */
+    margin-right: auto;   /* Centra el contenedor horizontalmente */
+    
+    /* Usamos Grid para alinear los 3 elementos en una bonita fila */
+    display: grid;
+    grid-template-columns: 1fr 1fr auto; /* Dos columnas flexibles para fechas, una para el botón */
+    align-items: flex-end; /* Alinea todo en la parte inferior */
+  }
+  
+  /* 2. Ajustamos el botón para que no ocupe todo el ancho */
+  .date-range-picker .btn-primary {
+    width: auto; /* El ancho se ajustará a su contenido */
+    flex-grow: 0; /* Evita que crezca para llenar espacio */
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  /* 3. Centramos y limitamos el ancho de la sección de resultados */
+  .report-result {
+    max-width: 550px; /* Mismo ancho que el selector para una apariencia coherente */
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.menu-panel {
+  position: absolute;
+  z-index: 9999 !important;
+}
+
+.menu-panel {
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  border-radius: 12px;
+}
+
+.banner {
+  position: relative;
+  z-index: 2000 !important;
+}
+
+.menu-panel {
+  position: absolute;
+  z-index: 3000 !important;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+/* ===== MODAL DE PAGO ===== */
+.backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 5000;
+  justify-content: center;
+  align-items: center;
+}
+
+.backdrop.is-visible {
+  display: flex !important;
+}
+
+.dialog {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+
+.dialog .actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-small {
+  background: var(--brand, #DD338B);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-ghost {
+  background: none;
+  color: var(--brand, #DD338B);
+  border: 1px solid currentColor;
+}
+
+
+
 
 
 

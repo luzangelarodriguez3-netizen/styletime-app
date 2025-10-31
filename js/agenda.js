@@ -216,17 +216,17 @@ for (const a of data) {
             `;
         }
     }
-    // --- FIN DE LA LÓGICA ---
-
-    if (isExpired(dayISO, end)) {
-        card.classList.add('appt--expired');
-    }
-    if (a.status === 'cancelled') {
-        card.classList.add('appt--cancelled');
-    }
-
-
-
+   // ===== Lógica de clases visuales (PRIORIDAD CORRECTA) =====
+if (a.status === 'done') {
+  card.classList.add('appt--done');
+} else if (a.status === 'cancelled') {
+  card.classList.add('appt--cancelled');
+} else {
+  // Solo marcar como expirada si no es realizada ni cancelada
+  if (isExpired(dayISO, end)) {
+    card.classList.add('appt--expired');
+  }
+}
     card.innerHTML = `
       <div>
         <div class="appt__name">${a.customer_name || ''}</div>
@@ -347,16 +347,22 @@ dialog.querySelectorAll('.btn-status').forEach(btn => {
 
       if (error) throw error;
       
-      // Actualizamos el estado en memoria y en la tarjeta de la agenda
+    // Actualizamos el estado en memoria y en la tarjeta de la agenda
       appt.status = newStatus;
       if (cardEl) {
         cardEl.dataset.status = newStatus;
-        cardEl.classList.toggle('appt--cancelled', newStatus === 'cancelled');
-
-
         
+        // --- ¡AQUÍ ESTÁ LA MAGIA! ---
+        // 1. Quita todas las clases de estado para empezar de cero.
+        cardEl.classList.remove('appt--cancelled', 'appt--done');
 
-        // Podrías añadir una clase 'appt--done' si quieres un estilo visual para las realizadas
+        // 2. Añade la clase correcta según el nuevo estado.
+        if (newStatus === 'cancelled') {
+          cardEl.classList.add('appt--cancelled');
+        } else if (newStatus === 'done') {
+          cardEl.classList.add('appt--done');
+        }
+        // Si es 'confirmed', no se añade ninguna clase de color.
       }
       showToast('Estado actualizado', 'success', 1200);
 
@@ -589,7 +595,10 @@ manageSubscriptionUI(userAccessStatus);
 const paymentModalCloseBtn = document.getElementById('paymentModalClose');
 if (paymentModalCloseBtn) {
   paymentModalCloseBtn.addEventListener('click', () => {
-    if (paymentModal) paymentModal.style.display = 'none';
+    if (paymentModal) {
+      paymentModal.classList.remove('is-visible');
+      document.body.classList.remove('modal-open');
+    }
   });
 }
 // ===============================================================
