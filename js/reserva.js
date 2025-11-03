@@ -114,6 +114,9 @@ $('bizName').textContent = biz.business_name || 'Mi negocio';
 const logoEl = $('bizLogo'); logoEl.src = biz.logo_url || './assets/logo.svg'; logoEl.onerror = ()=>{logoEl.src='./assets/logo.svg';};
 if (biz.cover_url) $('pageCover').style.backgroundImage = `url('${biz.cover_url}')`;
 
+document.querySelector('main.phone').style.opacity = '1';
+
+
 const { data: services } = await sb.from('services').select('id,name,price,duration_min').eq('user_id', ownerId).order('name');
 const serviceSel = $('serviceSel'), priceEl = $('price'), durEl = $('duration');
 const svcInfo = $('svcInfo'), slotGrid = $('slotGrid'), slotHint = $('slotHint'), timeVal = $('timeVal');

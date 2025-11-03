@@ -89,6 +89,9 @@
       banner.classList.add('banner--with-cover');
     }
 
+
+    document.querySelector('main.phone').style.opacity = '1';
+
     /* ===== Menú Desplegable (3 puntos) ===== */
     const menuBtn   = document.getElementById('menuBtn');
     const menuPanel = document.getElementById('menuPanel');

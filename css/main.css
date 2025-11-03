@@ -2160,9 +2160,52 @@ body{
   border: 1px solid currentColor;
 }
 
+/* ===== ESTILOS PARA SKELETON LOADING ===== */
+
+/* La animación que crea el efecto pulsante */
+@keyframes pulse-bg {
+  0%   { background-color: #f0f0f0; }
+  50%  { background-color: #e6e6e6; }
+  100% { background-color: #f0f0f0; }
+}
+
+/* Contenedor principal de un esqueleto de tarjeta de cita */
+.card.is-skeleton {
+  background-color: #f9f9f9;
+  border-color: #f0f0f0;
+  pointer-events: none; /* Evita que se pueda hacer clic en el esqueleto */
+}
+
+/* Los bloques grises que simulan el texto */
+.card.is-skeleton .skeleton {
+  animation: pulse-bg 1.8s infinite ease-in-out;
+  border-radius: 6px;
+  color: transparent !important; /* Oculta cualquier texto residual */
+  user-select: none;
+  background-color: #f0f0f0; /* Color base */
+}
+
+/* Ajustes de tamaño para cada parte del esqueleto */
+.card.is-skeleton .appt__name.skeleton {
+  height: 20px;
+  width: 60%;
+  margin-bottom: 8px;
+}
+.card.is-skeleton .appt__meta .skeleton {
+  height: 14px;
+  width: 80%;
+}
+.card.is-skeleton .appt__time.skeleton {
+  height: 20px;
+  width: 90px;
+}
 
 
+/* --- SOLUCIÓN PARA EL PARPADEO DE CARGA INICIAL --- */
 
-
-
-
+/* 1. Por defecto, el contenido principal estará invisible pero ocupará su espacio. */
+main.phone {
+  opacity: 0;
+  /* 2. Preparamos una transición suave para cuando lo hagamos visible. */
+  transition: opacity 0.4s ease-in-out;
+}

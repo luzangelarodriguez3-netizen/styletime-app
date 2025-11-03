@@ -88,6 +88,9 @@
       bannerEl.classList.add('banner--with-cover');
     }
 
+
+    document.querySelector('main.phone').style.opacity = '1';
+
     // Menú
     const menuBtn   = document.getElementById('menuBtn');
     const menuPanel = document.getElementById('menuPanel');

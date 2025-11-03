@@ -199,4 +199,6 @@ if (biz) {
     root.style.setProperty('--bg', biz.bg_pastel || '#FAE9F2');
 }
 
+document.querySelector('main.phone').style.opacity = '1';
+
 })();
