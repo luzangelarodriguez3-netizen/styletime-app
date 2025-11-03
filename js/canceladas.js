@@ -99,7 +99,7 @@
       banner.classList.add('banner--with-cover');
     }
 
-    document.querySelector('main.phone').style.opacity = '1';
+    document.querySelector('main.phone.fade-in-content').style.opacity = '1';
 
     // ===== Menú (3 punticos) =====
     const menuBtn = document.getElementById('menuBtn');

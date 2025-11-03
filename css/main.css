@@ -2203,9 +2203,8 @@ body{
 
 /* --- SOLUCIÓN PARA EL PARPADEO DE CARGA INICIAL --- */
 
-/* 1. Por defecto, el contenido principal estará invisible pero ocupará su espacio. */
-main.phone {
+/* --- SOLUCIÓN PARA EL PARPADEO DE CARGA INICIAL (VERSIÓN ESPECÍFICA) --- */
+main.phone.fade-in-content { /* <-- ¡LA CLAVE ESTÁ AQUÍ! */
   opacity: 0;
-  /* 2. Preparamos una transición suave para cuando lo hagamos visible. */
   transition: opacity 0.4s ease-in-out;
 }
