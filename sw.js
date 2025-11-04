@@ -1,3 +1,12 @@
+// --- INICIO: LISTENER PARA ACTIVACIÓN INMEDIATA BAJO DEMANDA ---
+self.addEventListener('message', event => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
+
+
 // sw.js - Versión con Caching
 
 // 1. Definimos el nombre y la versión de nuestro caché.
@@ -38,7 +47,9 @@ self.addEventListener('install', event => {
         console.log('✅ Service Worker: Abriendo caché y guardando el App Shell.');
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting()) // Activamos el nuevo SW inmediatamente.
+      .then(() => {
+    // Ya no hacemos nada aquí, solo esperamos
+  })
   );
 });
 
