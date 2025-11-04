@@ -11,7 +11,7 @@ self.addEventListener('message', event => {
 
 // 1. Definimos el nombre y la versión de nuestro caché.
 // CADA VEZ QUE HAGAS UN CAMBIO IMPORTANTE EN TU APP, CAMBIA EL NÚMERO (v1.1, v1.2, etc.)
-const CACHE_NAME = 'styletime-cache-v1.1';
+const CACHE_NAME = 'styletime-cache-v1.0';
 
 // 2. Esta es la lista de archivos fundamentales de tu aplicación (el "App Shell").
 const urlsToCache = [
@@ -47,9 +47,6 @@ self.addEventListener('install', event => {
         console.log('✅ Service Worker: Abriendo caché y guardando el App Shell.');
         return cache.addAll(urlsToCache);
       })
-      .then(() => {
-    // Ya no hacemos nada aquí, solo esperamos
-  })
   );
 });
 
@@ -70,7 +67,7 @@ self.addEventListener('activate', event => {
     })
   );
   // Le dice al SW que tome el control de la página inmediatamente.
-  return self.clients.claim();
+  
 });
 
 // 5. Evento 'fetch': Se dispara CADA VEZ que la app pide un recurso (una página, una imagen, etc.).
