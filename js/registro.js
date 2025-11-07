@@ -54,9 +54,10 @@
             if (error) throw error;
 
             // ÉXITO
-            msg.textContent = '¡Listo! Revisa tu bandeja de entrada y haz clic en el enlace para confirmar tu cuenta.';
-            form.reset(); // Limpia el formulario
-            termsCheckbox.checked = false; // Desmarca la casilla
+showToast('¡Listo! Revisa tu correo para confirmar la cuenta.', 'success', 6000); // 6 segundos
+form.reset(); // Limpia el formulario
+termsCheckbox.checked = false; // Desmarca la casilla
+// Dejamos el msg de abajo intacto, con su texto original
 
         } catch (err) {
             console.error('Error en el registro:', err);
