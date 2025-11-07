@@ -52,12 +52,16 @@
             });
 
             if (error) throw error;
+// ÉXITO
+// 1. Mostramos la notificación flotante (toast), que es la que se ve bien.
+showToast('¡Listo! Revisa tu correo para confirmar la cuenta.', 'success', 6000); 
 
-            // ÉXITO
-showToast('¡Listo! Revisa tu correo para confirmar la cuenta.', 'success', 6000); // 6 segundos
-form.reset(); // Limpia el formulario
-termsCheckbox.checked = false; // Desmarca la casilla
-// Dejamos el msg de abajo intacto, con su texto original
+// 2. Limpiamos el formulario.
+form.reset(); 
+termsCheckbox.checked = false;
+
+// 3. ¡AQUÍ ESTÁ EL CAMBIO! Limpiamos el mensaje de abajo para que no muestre nada.
+msg.textContent = ''; // Esto limpia cualquier mensaje de error anterior.
 
         } catch (err) {
             console.error('Error en el registro:', err);
@@ -68,7 +72,7 @@ termsCheckbox.checked = false; // Desmarca la casilla
                 friendlyMessage = err.message;
             }
             showToast(friendlyMessage, 'error');
-            msg.textContent = friendlyMessage;
+            
             
             // Reactivamos el botón SOLO si hubo un error
             registerButton.disabled = false;

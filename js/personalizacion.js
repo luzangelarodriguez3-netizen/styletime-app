@@ -1,13 +1,15 @@
-// js/personalizacion.js (VERSIÓN FINAL Y ROBUSTA)
+// js/personalizacion.js (VERSIÓN FINAL Y ESTRUCTURADA)
 
-(async () => {
-    // 1. VERIFICACIÓN DE SESIÓN CON GUARDIÁN (Como ya lo tenías, perfecto)
+// 1. Envolvemos todo en una función principal async para controlar el flujo.
+async function initializePage() {
+
+    // 2. PRIMERA BARRERA: Verificamos la sesión. Nada ocurre hasta que esto termine.
     const user = await protectPage();
-    if (!user) return; // Si no hay usuario, el guardián ya nos redirigió.
+    if (!user) return; // Si no hay usuario, el script se detiene aquí.
     const userId = user.id;
 
-    // --- Referencias a los elementos del DOM (Asegúrate de que los IDs coincidan con tu HTML) ---
-    const form = document.querySelector('form.form'); // Usamos un selector más genérico por si no tienes ID
+    // --- 3. Referencias a TODOS los elementos del DOM ---
+    const form = document.querySelector('form.form');
     const logoInput = document.getElementById('logoInput');
     const logoPreview = document.getElementById('logoPreview');
     const bgInput = document.getElementById('bgInput');
@@ -15,109 +17,89 @@
     const bizNameEl = document.getElementById('bizName');
     const colorPicker = document.getElementById('colorPicker');
     const hexInput = document.getElementById('hexInput');
-    const saveButton = document.querySelector('.actions .btn'); // Seleccionamos el botón de guardar
+    const saveButton = form.querySelector('button'); // Botón dentro del form
     const logoPicker = document.querySelector('.logo-picker');
-
-    // --- Funciones de Ayuda (reutilizadas) ---
-    function showToast(msg, type = 'info', ms = 3000) { /* ... tu código de showToast ... */ }
-    function hexToRgb(hex) { /* ... tu código de hexToRgb ... */ }
-    function toHex(n) { /* ... tu código de toHex ... */ }
-    function mixWithWhite(hex, t = 0.88) { /* ... tu código de mixWithWhite ... */ }
-
-    // --- Lógica de la página ---
-    let biz = null; // Variable para guardar los datos del negocio
-
-    // Conectar clic del logo al input
-    if (logoPicker) {
-        logoPicker.addEventListener('click', () => logoInput.click());
-    }
+    const toast = document.getElementById('toast');
     
-    // Función para validar archivos
+    // --> ¡CLAVE! Deshabilitamos el botón hasta que todo esté cargado y listo.
+    saveButton.disabled = true;
+    saveButton.textContent = 'Cargando...';
+
+    // --- 4. Definición de TODAS las funciones de ayuda ---
+    // Estas funciones ahora están disponibles para todo el script.
+    function showToast(msg, type = 'info', ms = 3000) {
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.className = `toast toast--${type} is-visible`;
+        toast.hidden = false;
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => { toast.classList.remove('is-visible') }, ms);
+    }
+    function hexToRgb(hex) { const n = hex.replace('#', ''); const big = parseInt(n.length === 3 ? n.split('').map(c => c + c).join('') : n.slice(0, 6), 16); return { r: (big >> 16) & 255, g: (big >> 8) & 255, b: big & 255 }; }
+    function mixWithWhite(hex, t = 0.88) { const { r, g, b } = hexToRgb(hex); const rr = Math.round(r + (255 - r) * t), gg = Math.round(g + (255 - g) * t), bb = Math.round(b + (255 - b) * t); function toHex(n) { return n.toString(16).padStart(2, '0'); } return `#${toHex(rr)}${toHex(gg)}${toHex(bb)}`; }
     function validateFile(file) {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
         const MAX_SIZE_MB = 2;
-        if (!allowedTypes.includes(file.type)) {
-            showToast('Tipo de archivo no permitido.', 'error');
-            return false;
-        }
-        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-            showToast(`El archivo es demasiado grande (máx ${MAX_SIZE_MB} MB).`, 'error');
-            return false;
-        }
+        if (!allowedTypes.includes(file.type)) { showToast('Tipo de archivo no permitido.', 'error'); return false; }
+        if (file.size > MAX_SIZE_MB * 1024 * 1024) { showToast(`El archivo es demasiado grande (máx ${MAX_SIZE_MB} MB).`, 'error'); return false; }
         return true;
     }
-
-    // Lógica para las vistas previas de imágenes
-    logoInput?.addEventListener('change', e => {
-        const file = e.target.files?.[0];
-        if (!file || !validateFile(file)) return;
-        logoPreview.src = URL.createObjectURL(file);
-    });
-
-    bgInput?.addEventListener('change', e => {
-        const file = e.target.files?.[0];
-        if (!file || !validateFile(file)) return;
-        bgThumb.style.backgroundImage = `url('${URL.createObjectURL(file)}')`;
-        bgThumb.textContent = '';
-    });
-
-    // Lógica para el selector de color
     const setThemeColor = (hex) => {
-        if (!/^#([0-9a-f]{3,8})$/i.test(hex)) return;
+        if (!/^#([0-9a-f]{3,6})$/i.test(hex)) return;
         document.documentElement.style.setProperty('--brand', hex);
         const rgb = hexToRgb(hex);
         document.documentElement.style.setProperty('--brand-rgb', `${rgb.r} ${rgb.g} ${rgb.b}`);
-        document.documentElement.style.setProperty('--bg', mixWithWhite(hex, 0.88));
+        document.documentElement.style.setProperty('--bg', mixWithWhite(hex));
     };
-    colorPicker.addEventListener('input', e => { const v = e.target.value.toUpperCase(); hexInput.value = v; setThemeColor(v); });
-    hexInput.addEventListener('input', e => { const v = e.target.value.trim(); setThemeColor(v); if (/^#([0-9a-f]{3,8})$/i.test(v)) colorPicker.value = v; });
 
-    // --- FUNCIÓN PRINCIPAL PARA CARGAR O CREAR EL PERFIL ---
-    async function initializeProfile() {
-        // 1. Intentamos cargar el perfil existente
+    // --- 5. Cargamos los datos del negocio y poblamos el formulario ---
+    let biz = null;
+    try {
         let { data: existingBiz, error } = await sb.from('businesses').select('*').eq('user_id', userId).single();
-
         if (existingBiz) {
-            biz = existingBiz; // Si existe, lo guardamos
+            biz = existingBiz;
         } else if (error && error.code === 'PGRST116') {
-            // 2. Si NO existe, lo creamos con valores por defecto
-            console.log('Perfil no encontrado, creando uno nuevo...');
-            const trialEndDate = new Date();
-            trialEndDate.setDate(trialEndDate.getDate() + 15);
-            const { data: newBiz, error: createError } = await sb
-                .from('businesses')
-                .insert({
-                    user_id: userId,
-                    business_name: 'Mi negocio',
-                    brand: '#DD338B',
-                    bg_pastel: '#FBE7F1',
-                    subscription_status: 'trial',
-                    current_period_ends_at: trialEndDate.toISOString()
-                }).select().single();
-
-            if (createError) throw new Error("No pudimos crear tu perfil. Contacta a soporte.");
-            
-            biz = newBiz; // Guardamos el nuevo perfil
+            const trialEndDate = new Date(); trialEndDate.setDate(trialEndDate.getDate() + 15);
+            const { data: newBiz, error: createError } = await sb.from('businesses').insert({ user_id: userId, business_name: 'Mi negocio', brand: '#DD338B', bg_pastel: '#FBE7F1', subscription_status: 'trial', current_period_ends_at: trialEndDate.toISOString() }).select().single();
+            if (createError) throw createError;
+            biz = newBiz;
             showToast('¡Tu cuenta ha sido activada!', 'success');
         } else {
-            // Cualquier otro error es grave
             throw error;
         }
 
-        // 3. Rellenamos el formulario con los datos de 'biz' (ya sea el cargado o el nuevo)
+        // --- 6. POBLAMOS el formulario DESPUÉS de tener los datos ---
         bizNameEl.value = biz.business_name || '';
         const brand = biz.brand || '#DD338B';
-        colorPicker.value = brand; hexInput.value = brand; setThemeColor(brand);
+        colorPicker.value = brand;
+        hexInput.value = brand;
+        setThemeColor(brand); // <-- Aplicamos el color INICIAL
         if (biz.logo_url) logoPreview.src = biz.logo_url;
         if (biz.cover_url) {
             bgThumb.style.backgroundImage = `url('${biz.cover_url}')`;
             bgThumb.textContent = '';
         }
+        
+        // --> ¡CLAVE! Habilitamos el botón SOLO cuando todo está listo.
+        saveButton.disabled = false;
+        saveButton.textContent = 'Guardar y continuar';
+
+    } catch (err) {
+        console.error("Error al cargar el perfil:", err);
+        showToast('Error crítico al cargar tu perfil. Refresca la página.', 'error');
+        saveButton.textContent = 'Error al Cargar';
     }
 
-    // --- LÓGICA PARA GUARDAR LOS CAMBIOS ---
+    // --- 7. REGISTRAMOS los event listeners DESPUÉS de que todo ha cargado ---
+    logoPicker?.addEventListener('click', () => logoInput.click());
+    logoInput?.addEventListener('change', e => { const file = e.target.files?.[0]; if (!file || !validateFile(file)) { e.target.value = ''; return; } logoPreview.src = URL.createObjectURL(file); });
+    bgInput?.addEventListener('change', e => { const file = e.target.files?.[0]; if (!file || !validateFile(file)) { e.target.value = ''; return; } bgThumb.style.backgroundImage = `url('${URL.createObjectURL(file)}')`; bgThumb.textContent = ''; });
+    colorPicker.addEventListener('input', e => { const v = e.target.value.toUpperCase(); hexInput.value = v; setThemeColor(v); });
+    hexInput.addEventListener('input', e => { const v = e.target.value.trim(); if (/^#([0-9a-f]{3,6})$/i.test(v)) { colorPicker.value = v; setThemeColor(v); } });
+
     saveButton.addEventListener('click', async (ev) => {
         ev.preventDefault();
+        if (saveButton.disabled) return;
         saveButton.disabled = true;
         saveButton.textContent = 'Guardando...';
 
@@ -125,37 +107,22 @@
             let logo_url = biz?.logo_url ?? null;
             let cover_url = biz?.cover_url ?? null;
 
-            // Subir logo (ahora usa 'userId' en lugar de 'u.user.id')
             if (logoInput?.files?.[0]) {
                 const file = logoInput.files[0];
                 const path = `${userId}/logo_${Date.now()}`;
-                const { error: upErr } = await sb.storage.from('logos').upload(path, file, { upsert: true });
-                if (upErr) throw upErr;
-                const { data: pub } = sb.storage.from('logos').getPublicUrl(path);
-                logo_url = pub.publicUrl;
+                await sb.storage.from('logos').upload(path, file, { upsert: true });
+                logo_url = sb.storage.from('logos').getPublicUrl(path).data.publicUrl;
             }
 
-            // Subir fondo (ahora usa 'userId')
             if (bgInput?.files?.[0]) {
                 const file = bgInput.files[0];
                 const path = `${userId}/cover_${Date.now()}`;
-                const { error: upErr } = await sb.storage.from('covers').upload(path, file, { upsert: true });
-                if (upErr) throw upErr;
-                const { data: pub } = sb.storage.from('covers').getPublicUrl(path);
-                cover_url = pub.publicUrl;
+                await sb.storage.from('covers').upload(path, file, { upsert: true });
+                cover_url = sb.storage.from('covers').getPublicUrl(path).data.publicUrl;
             }
 
             const brand = (hexInput.value || '#DD338B').toUpperCase();
-            const payload = {
-                user_id: userId,
-                business_name: bizNameEl.value.trim() || 'Mi negocio',
-                brand,
-                bg_pastel: mixWithWhite(brand, 0.88),
-                logo_url,
-                cover_url,
-                updated_at: new Date().toISOString()
-            };
-
+            const payload = { user_id: userId, business_name: bizNameEl.value.trim() || 'Mi negocio', brand, bg_pastel: mixWithWhite(brand), logo_url, cover_url, updated_at: new Date().toISOString() };
             const { error: dbErr } = await sb.from('businesses').upsert(payload, { onConflict: 'user_id' });
             if (dbErr) throw dbErr;
 
@@ -169,12 +136,7 @@
             saveButton.textContent = 'Guardar y continuar';
         }
     });
+}
 
-    // --- EJECUCIÓN INICIAL ---
-    // Llamamos a la función principal para cargar los datos en cuanto la página esté lista.
-    initializeProfile().catch(err => {
-        console.error("Error al inicializar el perfil:", err);
-        showToast('Error crítico al cargar el perfil.', 'error', 5000);
-    });
-
-})();
+// 8. Se llama a la función principal para iniciar todo el proceso.
+initializePage();
