@@ -4,10 +4,11 @@
             
 
 
-    // ===== Sesión =====
-    const { data: u } = await sb.auth.getUser();
-    if (!u?.user) { location.href = 'login.html'; return; }
-    const userId = u.user.id;
+   // ===== VERIFICACIÓN DE SESIÓN CON GUARDIÁN =====
+const user = await protectPage();
+if (!user) return; // Si no hay usuario, el guardián ya redirigió. Detenemos la ejecución.
+const userId = user.id;
+
 
     // ===== Helpers =====
     const daysGrid = document.getElementById('daysGrid');

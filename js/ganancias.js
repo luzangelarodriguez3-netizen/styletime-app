@@ -2,13 +2,10 @@
   // Principio de bajo acoplamiento: este archivo no depende de ningún otro archivo JS de la app,
   // solo de las librerías (Supabase) y la configuración (supabaseClient).
 
-  // ===== 1. VERIFICACIÓN DE SESIÓN Y CONFIGURACIÓN INICIAL =====
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) {
-    location.href = 'login.html'; // Si no hay sesión, no se puede continuar
-    return;
-  }
-  const userId = user.id;
+ // ===== 1. VERIFICACIÓN DE SESIÓN CON GUARDIÁN =====
+const user = await protectPage();
+if (!user) return; // El guardián ya redirigió si no hay usuario.
+const userId = user.id;
 
   // ===== 2. REFERENCIAS A ELEMENTOS DEL DOM =====
   // Guardamos las referencias a los elementos HTML para no buscarlos repetidamente.

@@ -49,10 +49,10 @@
 
     const groupThousands = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-    /* ===== Sesión y Autenticación ===== */
-    const { data: u } = await sb.auth.getUser();
-    if (!u?.user) { location.href = 'login.html'; return; }
-    const userId = u.user.id;
+    // ===== VERIFICACIÓN DE SESIÓN CON GUARDIÁN =====
+const user = await protectPage();
+if (!user) return; // Si no hay usuario, el guardián ya redirigió. Detenemos la ejecución.
+const userId = user.id;
 
     /* ===== Carga de datos del negocio para tema y portada ===== */
     const { data: biz, error: bizErr } = await sb

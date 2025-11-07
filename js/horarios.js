@@ -50,11 +50,10 @@
     const timeToMin = v => { const p=v.split(':'); const h=+(p[0]||0), m=+(p[1]||0); return (h*60+m)|0; }
     const minToTime = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
 
-    // Sesión
-    const { data: userData } = await sb.auth.getUser();
-    if (!userData || !userData.user){ location.href = 'login.html'; return; }
-    const userId = userData.user.id;
-
+   // ===== VERIFICACIÓN DE SESIÓN CON GUARDIÁN =====
+const user = await protectPage();
+if (!user) return; // El guardián ya redirigió si no hay usuario.
+const userId = user.id;
     // Tema + portada
     const bizResp = await sb
       .from('businesses')

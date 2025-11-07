@@ -2,8 +2,12 @@
 
   
 
-    const { data: u } = await sb.auth.getUser();
-    if (!u?.user) { location.href = 'login.html'; return; }
+   // ===== VERIFICACIÓN DE SESIÓN CON GUARDIÁN =====
+const user = await protectPage();
+if (!user) return; // Si no hay usuario, el guardián ya redirigió.
+
+// Si tu código de personalización necesita el userId, lo defines así:
+const userId = user.id;
 
     function hexToRgb(hex){const n=hex.replace('#','');const big=parseInt(n.length===3?n.split('').map(c=>c+c).join(''):n.slice(0,6),16);return{r:(big>>16)&255,g:(big>>8)&255,b:big&255};}
     function toHex(n){return n.toString(16).padStart(2,'0');}

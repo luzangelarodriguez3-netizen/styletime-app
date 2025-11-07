@@ -37,11 +37,13 @@
     
     
     
-    // sesión
-    const { data: u } = await sb.auth.getUser();
-    if(!u?.user){ location.href='login.html'; return; }
-    const userId = u.user.id;
-    const userEmail = u.user.email || '';
+   // ===== VERIFICACIÓN DE SESIÓN CON GUARDIÁN =====
+const user = await protectPage();
+if (!user) return; // Si no hay usuario, el guardián ya redirigió. Detenemos la ejecución.
+
+// Ahora obtenemos el 'userId' y 'userEmail' del objeto 'user' que nos devolvió el guardián.
+const userId = user.id;
+const userEmail = user.email || '';
 
     // tema/negocio
     const { data: biz } = await sb.from('businesses').select('*, subscription_status, current_period_ends_at').eq('user_id', userId).order('updated_at',{ascending:false}).limit(1).maybeSingle();
