@@ -3,7 +3,7 @@
 // 1. Definimos el nombre y la versión de nuestro caché.
 // ¡ESTA ES LA LÍNEA MÁS IMPORTANTE! CADA VEZ QUE HAGAS UN CAMBIO,
 // INCREMENTA EL NÚMERO DE VERSIÓN (ej. v1.1, v1.2, etc.).
-const CACHE_NAME = 'styletime-cache-v1.0';
+const CACHE_NAME = 'styletime-cache-v1.1';
 
 // 2. Esta es la lista de archivos fundamentales de tu aplicación (el "App Shell").
 // Asegúrate de que todas las rutas sean correctas.

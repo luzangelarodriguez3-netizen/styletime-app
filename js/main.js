@@ -2,7 +2,7 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     // Añadimos el parámetro de versión para romper la caché
-    navigator.serviceWorker.register('/sw.js?v=1.0')
+    navigator.serviceWorker.register('/sw.js?v=1.1')
       .then(registration => {
         console.log('✅ Service Worker registrado.');
       })
