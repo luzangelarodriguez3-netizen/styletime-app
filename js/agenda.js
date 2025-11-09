@@ -93,7 +93,7 @@ root.style.setProperty('--bg',biz.bg_pastel||'#FAE9F2');
 const logoEl=document.getElementById('bizLogo'); logoEl.src=biz.logo_url||'./assets/logo.svg'; logoEl.onerror=()=>{logoEl.src='./assets/logo.svg';};
 const pageCover=document.getElementById('pageCover'); const banner=document.getElementById('banner'); if(biz.cover_url){pageCover.style.backgroundImage=`url('${biz.cover_url}')`; banner.style.setProperty('--cover-url',`url('${biz.cover_url}')`); banner.classList.add('banner--with-cover');}
 
-document.querySelector('main.phone.fade-in-content').style.opacity = '1';
+
 
 
 

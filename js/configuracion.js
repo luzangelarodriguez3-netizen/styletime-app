@@ -54,7 +54,7 @@ const userEmail = user.email || '';
     const logoEl=$('bizLogo'); logoEl.src=biz.logo_url||'./assets/logo.svg'; logoEl.onerror=()=>{logoEl.src='./assets/logo.svg';};
     if(biz.cover_url){ $('pageCover').style.backgroundImage=`url('${biz.cover_url}')`; const banner=$('banner'); banner.style.setProperty('--cover-url',`url('${biz.cover_url}')`); banner.classList.add('banner--with-cover'); }
 
-     document.querySelector('main.phone.fade-in-content').style.opacity = '1'; 
+     
 
     // PEGA ESTE BLOQUE JUSTO DESPUÉS DE LA VERIFICACIÓN DE 'biz'
 

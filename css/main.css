@@ -2201,10 +2201,3 @@ body{
 }
 
 
-/* --- SOLUCIÓN PARA EL PARPADEO DE CARGA INICIAL --- */
-
-/* --- SOLUCIÓN PARA EL PARPADEO DE CARGA INICIAL (VERSIÓN ESPECÍFICA) --- */
-main.phone.fade-in-content { /* <-- ¡LA CLAVE ESTÁ AQUÍ! */
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-}

@@ -90,7 +90,7 @@ const userId = user.id;
     }
 
 
-    document.querySelector('main.phone.fade-in-content').style.opacity = '1';
+    
 
     /* ===== Menú Desplegable (3 puntos) ===== */
     const menuBtn   = document.getElementById('menuBtn');
